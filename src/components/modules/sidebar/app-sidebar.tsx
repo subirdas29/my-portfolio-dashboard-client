@@ -38,38 +38,29 @@ const data = {
     },
     {
       title: "Manage Projects",
-      url: "/user/shop/products",
+      url: "/projects/all-projects",
       icon: Bot,
       items: [
-        {
-          title: "Add Projects",
-          url: "/projects/add-projects",
-        },
         {
           title: "All Projects",
           url: "/projects/all-projects",
         },
-      ],
-    },
-    {
-      title: "Manage Blogs",
-      url: "/user/shop/products",
-      icon: Bot,
-      items: [
         {
-          title: "Manage Products",
-          url: "/user/shop/products",
+          title: "Add Projects",
+          url: "/projects/add-projects",
         },
+     
       ],
     },
+  
     {
       title: "Manage Skills",
-      url: "/user/shop/products",
+      url: "/skills/add-skills",
       icon: Bot,
       items: [
         {
-          title: "Manage Products",
-          url: "/user/shop/products",
+          title: "Skills",
+          url: "/skills/add-skills",
         },
       ],
     },
@@ -85,13 +76,24 @@ const data = {
       ],
     },
     {
-      title: "Manage Contacts",
-      url: "/user/shop/products",
+      title: "Manage Blogs",
+      url: "/blogs/add-blog",
       icon: Bot,
       items: [
         {
-          title: "Manage Products",
-          url: "/user/shop/products",
+          title: "Add Blogs",
+          url: "/blogs/add-blog",
+        },
+      ],
+    },
+    {
+      title: "Manage Contacts",
+      url: "/contact",
+      icon: Bot,
+      items: [
+        {
+          title: "All Contacts",
+          url: "/contact",
         },
       ],
     },

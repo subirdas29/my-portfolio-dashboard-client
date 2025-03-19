@@ -14,6 +14,8 @@ import ImagePreviewer from "@/components/ui/core/PortfolioImageUploader/ImagePre
 import { TProjects } from "@/types/projects";
 import PortfolioImageUploader from "@/components/ui/core/PortfolioImageUploader";
 import { createProjects } from "@/services/Projects";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { projectType } from "@/constant/project";
 
 export default function AddProjectForm() {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -72,7 +74,20 @@ export default function AddProjectForm() {
                             <FormItem>
                                 <FormLabel>Project Type</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl className="w-1/2">
+                    <SelectTrigger>
+            <SelectValue placeholder={field.value || "Select project type"} />
+          </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {projectType.map((project, idx) => (
+                        <SelectItem key={idx} value={project}>
+                          {project}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
