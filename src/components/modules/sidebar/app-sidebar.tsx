@@ -37,7 +37,22 @@ const data = {
       isActive: true,
     },
     {
-      title: "Shop",
+      title: "Manage Projects",
+      url: "/user/shop/products",
+      icon: Bot,
+      items: [
+        {
+          title: "Add Projects",
+          url: "/projects/add-projects",
+        },
+        {
+          title: "All Projects",
+          url: "/projects/all-projects",
+        },
+      ],
+    },
+    {
+      title: "Manage Blogs",
       url: "/user/shop/products",
       icon: Bot,
       items: [
@@ -45,13 +60,38 @@ const data = {
           title: "Manage Products",
           url: "/user/shop/products",
         },
+      ],
+    },
+    {
+      title: "Manage Skills",
+      url: "/user/shop/products",
+      icon: Bot,
+      items: [
         {
-          title: "Manage Categories",
-          url: "/user/shop/category",
+          title: "Manage Products",
+          url: "/user/shop/products",
         },
+      ],
+    },
+    {
+      title: "Manage Experience",
+      url: "/user/shop/products",
+      icon: Bot,
+      items: [
         {
-          title: "Manage Brands",
-          url: "/user/shop/brand",
+          title: "Manage Products",
+          url: "/user/shop/products",
+        },
+      ],
+    },
+    {
+      title: "Manage Contacts",
+      url: "/user/shop/products",
+      icon: Bot,
+      items: [
+        {
+          title: "Manage Products",
+          url: "/user/shop/products",
         },
       ],
     },

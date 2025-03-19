@@ -1,0 +1,1 @@
+export const projectType = ["Full-Stack" , "Front-End"]
