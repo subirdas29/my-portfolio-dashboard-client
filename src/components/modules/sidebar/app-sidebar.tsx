@@ -84,6 +84,10 @@ const data = {
           title: "Add Blogs",
           url: "/blogs/add-blog",
         },
+        {
+          title: "All Blogs",
+          url: "/blogs/all-blogs",
+        },
       ],
     },
     {

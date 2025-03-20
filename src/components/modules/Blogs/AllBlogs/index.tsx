@@ -1,85 +1,84 @@
 "use client";
 
-import { TProjects } from "@/types/projects";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit, Trash, Eye } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { useRouter } from "next/navigation";
+
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
-import { deleteProject } from "@/services/Projects";
 
-const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
-    console.log(projects)
+
+import { TBlog } from "@/types/blogs";
+import { deleteBlog } from "@/services/Blogs";
+
+const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
+
   const router = useRouter();
 
-  const handleDelete = (project: TProjects) => {
-    if (!project._id) return;
-    setSelectedId(project?._id);
-    setSelectedTitle(project?.title);
-
-
+  const handleDelete = (blog: TBlog) => {
+    if (!blog._id) return;
+    
+    setSelectedId(blog?._id);
+    console.log(selectedId)
+    setSelectedTitle(blog?.title);
     setModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      
-        if (selectedId) {
-            const res = await deleteProject(selectedId);
-            console.log(res);
-            if (res.success) {
-              toast.success(res.message);
-              setModalOpen(false);
-            } else {
-              toast.error(res.message);
-            }
-          }
+      if (selectedId) {
+        const res = await deleteBlog(selectedId);
+        console.log(res)
+        if (res.success) {
+          toast.success(res.message);
+          setModalOpen(false);
+        } else {
+          toast.error(res.message);
+        }
+      }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to cancel order.");
+      toast.error("Failed to delete blog.");
     }
   };
 
-  const columns: ColumnDef<TProjects>[] = [
-    {
-      accessorKey: "imageUrls",
-      header: "Image",
-      cell: ({ row }) => (
-        <Image
-          src={row.original.imageUrls[0]}
-          alt={row.original.title}
-          width={50}
-          height={50}
-          className="w-12 h-12 rounded object-cover"
-        />
-      ),
-    },
+  const columns: ColumnDef<TBlog>[] = [
+    // {
+    //   accessorKey: "bannerImage",
+    //   header: "Banner",
+    //   cell: ({ row }) =>
+    //     row.original.bannerImage ? (
+    //       <Image
+    //         src={row.original.bannerImage}
+    //         alt={row.original.title}
+    //         className="w-12 h-12 rounded object-cover"
+    //       />
+    //     ) : (
+    //       <span className="text-gray-500">No Image</span>
+    //     ),
+    // },
     {
       accessorKey: "title",
-      header: "Project Title",
+      header: "Title",
       cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
     },
     {
-      accessorKey: "projectType",
-      header: "Project Type",
-      cell: ({ row }) => <span>{row.original.projectType}</span>,
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => <span className="text-gray-600">{row.original.category}</span>,
     },
     {
-      accessorKey: "technologies",
-      header: "Technologies",
+      accessorKey: "content",
+      header: "Content",
       cell: ({ row }) => (
         <span className="text-sm text-gray-600">
-          {Array.isArray(row.original.technologies)
-            ? row.original.technologies.join(", ")
-            : row.original.technologies}
+          {row.original.content.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 50)}...
         </span>
       ),
     },
@@ -90,8 +89,8 @@ const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
         <div className="flex space-x-3">
           <button
             className="text-yellow-600 cursor-pointer"
-            title="View Live"
-            onClick={() => window.open(row.original.liveLink, "_blank")}
+            title="View Blog"
+            onClick={() => router.push(`/blogs/${row.original._id}`)}
           >
             <Eye className="w-5 h-5" />
           </button>
@@ -99,7 +98,7 @@ const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
           <button
             className="text-green-500 hover:text-blue-500 cursor-pointer"
             title="Edit"
-            onClick={() => router.push(`/projects/update-project/${row.original._id}`)}
+            onClick={() => router.push(`/blogs/edit/${row.original._id}`)}
           >
             <Edit className="w-5 h-5" />
           </button>
@@ -118,9 +117,9 @@ const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-4">All Projects</h1>
+      <h1 className="text-xl font-bold mb-4">All Blogs</h1>
       <div className="overflow-x-auto">
-        <PortfolioTable columns={columns} data={projects || []} />
+        <PortfolioTable columns={columns} data={blogs || []} />
       </div>
       <DeleteConfirmationModal
         name={selectedTitle}
@@ -132,4 +131,4 @@ const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
   );
 };
 
-export default AllProjectsTable;
+export default AllBlogsTable;

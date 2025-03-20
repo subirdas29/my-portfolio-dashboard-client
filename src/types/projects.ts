@@ -1,7 +1,7 @@
 
 
 export type TProjects = {
-    _id:string;
+    _id?:string;
     title: string;
     projectType: string;
     details: string;

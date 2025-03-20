@@ -1,15 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
-import Image from "next/image";
+
 import { useState } from "react";
 
 
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
-import { TSkill } from "@/types/skills";
-import { deleteSkill } from "@/services/Skills";
+
 import { toast } from "sonner";
 import { TContact } from "@/types/contacts";
 import { deleteContact } from "@/services/contacts";

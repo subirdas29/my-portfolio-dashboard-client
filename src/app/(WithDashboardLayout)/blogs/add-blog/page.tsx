@@ -1,10 +1,11 @@
-import Editor from "@/components/modules/Blogs/AddBlogs"
+import CreateBlog from "@/components/modules/Blogs/AddBlogs"
+
 
 
 const BlogAddPage = () => {
   return (
     <div>
-      <Editor/>
+      <CreateBlog/>
     </div>
   )
 }

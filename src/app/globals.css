@@ -53,7 +53,7 @@
   --card-foreground: oklch(0.15 0.02 270);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.02 270);
-  --primary: oklch(0.68 0.14 76);
+  --primary: oklch(0.77 0.16 70);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.15 0.02 270);
@@ -121,4 +121,46 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+.prose blockquote {
+  border-left: 4px solid #4a90e2; /* Blue Border */
+  padding-left: 12px;
+  color: #333;
+  font-style: italic;
+  background-color: #f8f9fa; /* Light Gray Background */
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+}
+
+.prose pre {
+  background: #1e1e1e; /* Darker Background */
+  color: #d4d4d4; /* Light Text */
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: "Fira Code", "Courier New", monospace;
+  overflow-x: auto; /* Horizontal Scroll for Large Code */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #333;
+}
+
+/* Inline Code */
+.prose code {
+  background: #2d2d2d;
+  color: #ffae57;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.9em;
 }
