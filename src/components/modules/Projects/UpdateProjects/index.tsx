@@ -58,18 +58,24 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
     };
 
     try {
+      if (!project._id) {
+        toast.error("Project ID is missing!");
+        return;
+      }
+    
       const res = await updateProject(modifiedData, project._id);
-      if (res.success) {
+    
+      if (res?.success) {
         toast.success("Project updated successfully!");
         router.push("/projects/all-projects");
       } else {
-        toast.error(res.message);
-        console.log(res)
+        toast.error(res?.message || "Failed to update project!");
+        console.error("Update Error:", res);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong!");
-    }
+      console.error("Unexpected Error:", error);
+      toast.error("Something went wrong! Please try again.");
+    }    
   };
 
   return (

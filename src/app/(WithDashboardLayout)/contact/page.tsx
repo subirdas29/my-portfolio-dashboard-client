@@ -1,14 +1,14 @@
-import ManageContacts from "@/components/modules/Contacts"
-import { getAllContacts } from "@/services/contacts"
+import ManageContacts from "@/components/modules/Contacts";
+import { getAllContacts } from "@/services/contacts";
 
+const ContactPage = async () => {
+    const { data:contact } = await getAllContacts(); 
 
-const ContactPage = async() => {
-    const {data} = await getAllContacts()
-  return (
-    <div>
-      <ManageContacts contact = {data}/>
-    </div>
-  )
-}
+    return (
+        <div>
+            <ManageContacts contact={contact} />
+        </div>
+    );
+};
 
-export default ContactPage
+export default ContactPage;

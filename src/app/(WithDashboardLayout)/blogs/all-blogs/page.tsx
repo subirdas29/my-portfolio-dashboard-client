@@ -4,10 +4,10 @@ import React from 'react'
 
 const AllBlogPage = async() => {
 
-    const {data} = await getAllBlogs()
+    const {data:blogs} = await getAllBlogs()
   return (
     <div>
-      <AllBlogsTable blogs={data}/>
+      <AllBlogsTable blogs={blogs}/>
     </div>
   )
 }
