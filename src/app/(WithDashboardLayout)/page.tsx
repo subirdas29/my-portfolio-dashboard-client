@@ -1,11 +1,14 @@
+import AllProjectsTable from "@/components/modules/Projects/AllProjects"
+import { getAllProjects } from "@/services/Projects"
 
 
-const AdminHomePage = () => {
-    return (
-      <div>
-        <h1>Admin Home Page</h1>
-      </div>
-    )
+const AdminHomePage = async() => {
+ const {data} = await getAllProjects()
+   return (
+     <div>
+       <AllProjectsTable projects={data}/>
+     </div>
+   )
   }
   
   export default AdminHomePage

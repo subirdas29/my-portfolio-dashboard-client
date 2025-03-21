@@ -39,7 +39,7 @@ export default function AddProjectForm() {
             // Replace with actual API call to create the project
             console.log("Project Data:", projectData);
             const res = await createProjects(projectData);
-        
+            console.log(res,'resdata')
             if (res.success) {
                 toast.success(res.message);
                 router.push("/projects/all-projects");
@@ -103,6 +103,18 @@ export default function AddProjectForm() {
                             </FormItem>
                         )} />
 
+                        <FormField control={form.control} name="keyFeatures" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Key Features</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} 
+                                    className="resize-none h-24"
+                                    placeholder="Enter Key Features, separated by commas"/>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+
                         <FormField control={form.control} name="technologies" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Technologies</FormLabel>
@@ -112,6 +124,7 @@ export default function AddProjectForm() {
                                 <FormMessage />
                             </FormItem>
                         )} />
+                      
 
                         <FormField control={form.control} name="liveLink" render={({ field }) => (
                             <FormItem>

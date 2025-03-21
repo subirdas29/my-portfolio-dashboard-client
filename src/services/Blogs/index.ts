@@ -64,3 +64,49 @@ export const getAllBlogs = async (page?: string,limit?:string) => {
       return Error(error);
     }
   };
+
+
+          // get single blog
+export const getSingleBlog = async (blogId: string) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/blogs/blog/${blogId}`,
+      {
+        next: {
+          tags: ["Blogs"],
+        },
+      }
+    );
+    const data = await res.json();
+    console.log(data,'server')
+    return data;
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+ //Update blogs
+  export const updateBlog = async (
+    blogId: string,
+    blogData:Partial<TBlog>,
+   
+  ): Promise<any> => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/blogs/edit-blog/${blogId}`,
+        {
+          method: "PATCH",
+        
+          headers: {
+            // Authorization: (await cookies()).get("accessToken")!.value,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(blogData),
+        }
+      );
+      revalidateTag("Blogs");
+      return await res.json();
+    } catch (error: any) {
+      return Error(error);
+    }
+  };

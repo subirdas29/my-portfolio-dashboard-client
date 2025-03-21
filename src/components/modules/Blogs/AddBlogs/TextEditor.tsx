@@ -11,25 +11,31 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const TextEditor = ({ onContentChange }: { onContentChange: (content: string) => void }) => {
+const TextEditor = ({
+  onContentChange,
+  initialContent = "", // Accept initial content
+}: {
+  onContentChange: (content: string) => void;
+  initialContent?: string;
+}) => {
   const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: [StarterKit, ImageExtension, Underline, Highlight],
-    content: "<p>Start writing...</p>",
+    content: initialContent, // Use initial content
     onUpdate: ({ editor }) => {
       onContentChange(editor.getHTML());
     },
   });
 
-  // Ensure images update properly
+  // Ensure content is set when editor initializes
   useEffect(() => {
-    if (editor) {
-      onContentChange(editor.getHTML());
+    if (editor && initialContent) {
+      editor.commands.setContent(initialContent);
     }
-  }, [images, editor, onContentChange]);
+  }, [editor, initialContent]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

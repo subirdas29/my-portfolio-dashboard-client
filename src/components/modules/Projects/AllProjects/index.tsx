@@ -72,17 +72,7 @@ const AllProjectsTable = ({ projects }: { projects: TProjects[] }) => {
       header: "Project Type",
       cell: ({ row }) => <span>{row.original.projectType}</span>,
     },
-    {
-      accessorKey: "technologies",
-      header: "Technologies",
-      cell: ({ row }) => (
-        <span className="text-sm text-gray-600">
-          {Array.isArray(row.original.technologies)
-            ? row.original.technologies.join(", ")
-            : row.original.technologies}
-        </span>
-      ),
-    },
+   
     {
       accessorKey: "actions",
       header: "Actions",

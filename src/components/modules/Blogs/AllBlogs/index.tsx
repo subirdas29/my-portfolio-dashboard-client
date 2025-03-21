@@ -98,7 +98,7 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
           <button
             className="text-green-500 hover:text-blue-500 cursor-pointer"
             title="Edit"
-            onClick={() => router.push(`/blogs/edit/${row.original._id}`)}
+            onClick={() => router.push(`/blogs/update-blog/${row.original._id}`)}
           >
             <Edit className="w-5 h-5" />
           </button>

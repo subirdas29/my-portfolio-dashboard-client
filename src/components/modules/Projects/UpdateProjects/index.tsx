@@ -34,11 +34,16 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
   ? project?.technologies.join(", ")
   : project?.technologies || "";
 
+  const keyFeatures = Array.isArray(project?.keyFeatures)
+  ? project?.keyFeatures.join(", ")
+  : project?.keyFeatures || "";
+
   const form = useForm({
     defaultValues: {
       title: project?.title || "",
       projectType: project?.projectType || "",
       details: project?.details || "",
+      keyFeatures,
       technologies,
       liveLink: project?.liveLink || "",
       clientGithubLink: project?.clientGithubLink || "",
@@ -128,6 +133,20 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="mt-4 text-primary text-md">Details</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+<FormField
+            control={form.control}
+            name="keyFeatures"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="mt-4 text-primary text-md">Key Features (comma separated)</FormLabel>
                 <FormControl>
                   <Textarea {...field} />
                 </FormControl>

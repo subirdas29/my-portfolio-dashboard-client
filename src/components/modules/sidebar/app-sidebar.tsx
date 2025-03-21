@@ -3,12 +3,8 @@
 import * as React from "react";
 import {
   Bot,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings,
+ 
+  // Settings,
   SquareTerminal,
 } from "lucide-react";
 
@@ -32,7 +28,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/user/dashboard",
+      url: "/",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -64,17 +60,17 @@ const data = {
         },
       ],
     },
-    {
-      title: "Manage Experience",
-      url: "/user/shop/products",
-      icon: Bot,
-      items: [
-        {
-          title: "Manage Products",
-          url: "/user/shop/products",
-        },
-      ],
-    },
+    // {
+    //   title: "Manage Experience",
+    //   url: "/user/shop/products",
+    //   icon: Bot,
+    //   items: [
+    //     {
+    //       title: "Manage Products",
+    //       url: "/user/shop/products",
+    //     },
+    //   ],
+    // },
     {
       title: "Manage Blogs",
       url: "/blogs/add-blog",
@@ -102,47 +98,19 @@ const data = {
       ],
     },
 
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-      items: [
-        {
-          title: "Profile",
-          url: "/profile",
-        },
-      ],
-    },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings,
+    //   items: [
+    //     {
+    //       title: "Profile",
+    //       url: "/profile",
+    //     },
+    //   ],
+    // },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
