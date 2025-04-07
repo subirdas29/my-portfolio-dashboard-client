@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛠 Portfolio Admin Dashboard
 
-## Getting Started
+A secure and responsive admin dashboard to manage your personal portfolio content including **projects**, **blogs**, and **skills**. Built with **Next.js**, **TypeScript**, and connected to a custom Express/MongoDB backend API.
 
-First, run the development server:
+🌐 **Live Dashboard:** [Visit Dashboard](https://my-portfolio-dashboard-six.vercel.app/)  
+📁 **Backend API:** [Portfolio Server](https://my-portfolio-server-five-delta.vercel.app/)  
+🎨 **Main Portfolio:** [Visit Portfolio](https://subirdas-portfolio.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Login-protected dashboard (JWT-based authentication)
+- Manage (Create, Edit, Delete):
+  - Projects
+  - Blogs
+  - Skills
+- Form validation and toast feedback on actions
+- Responsive design and clean UI
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🔐 Authentication
 
-To learn more about Next.js, take a look at the following resources:
+- Secure login using email & password
+- JWT stored in HTTP-only cookies
+- Protected client-side routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧩 Technologies Used
 
-## Deploy on Vercel
+- **Next.js 15** – React framework
+- **React 19**
+- **TypeScript** – Static type checking
+- **Tailwind CSS 4** – Utility-first styling
+- **React Hook Form** + **Zod** – Form handling and validation
+- **Lucide-react** – Icon library
+- **Sonner** – Toast notifications
+- **Axios** – API communication
+- **JWT** – Auth token-based route protection
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
