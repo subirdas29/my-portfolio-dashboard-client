@@ -40,6 +40,34 @@ export const getAllSkills = async (page?: string,limit?:string) => {
     }
   };
 
+
+
+export const updateSkillOrder = async (
+  payload: { id: string; order: number }[]
+): Promise<any> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/skills/reorder`, {
+      method: "PATCH", 
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization: (await cookies()).get("accessToken")?.value || "", 
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to update skill order");
+    }
+
+  
+    revalidateTag("Skills");
+    
+    return await res.json();
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+};
+
     // delete Skill
 export const deleteSkill = async (
     skillId: string

@@ -1,80 +1,69 @@
-"use client"
+"use client";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import React from "react";
+import { flexRender, Table as ReactTable } from "@tanstack/react-table";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+// Draggable Row Component
+const DraggableRow = ({ row }: { row: any }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: row.original._id });
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
-
-export function PortfolioTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? "rgba(245, 158, 11, 0.05)" : "transparent",
+    position: "relative",
+    zIndex: isDragging ? 10 : 1,
+  };
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className="border-b transition-colors hover:bg-muted/50"
+    >
+      {row.getVisibleCells().map((cell: any) => (
+        <td key={cell.id} className="p-4 align-middle">
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </td>
+      ))}
+    </tr>
+  );
+};
+
+// Main Table Component
+export const PortfolioTable = ({ table }: { table: ReactTable<any> }) => {
+  return (
+    <div className="rounded-md border bg-white dark:bg-slate-900 overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="border-b bg-gray-50 dark:bg-slate-800">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="bg-gray-200">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id} className="font-bold text-gray-600">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id} className="h-12 px-4 text-left font-bold text-gray-700 dark:text-gray-200">
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
+              ))}
+            </tr>
           ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <DraggableRow key={row.id} row={row} />
+          ))}
+        </tbody>
+      </table>
     </div>
-  )
-}
+  );
+};

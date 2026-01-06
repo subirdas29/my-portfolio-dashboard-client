@@ -1,16 +1,13 @@
 "use client";
 
-
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Edit, Trash, Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
-
-
 import { TBlog } from "@/types/blogs";
 import { deleteBlog } from "@/services/Blogs";
 
@@ -23,10 +20,8 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
 
   const handleDelete = (blog: TBlog) => {
     if (!blog._id) return;
-    
-    setSelectedId(blog?._id);
-    console.log(selectedId)
-    setSelectedTitle(blog?.title);
+    setSelectedId(blog._id);
+    setSelectedTitle(blog.title);
     setModalOpen(true);
   };
 
@@ -34,7 +29,6 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
     try {
       if (selectedId) {
         const res = await deleteBlog(selectedId);
-        console.log(res)
         if (res.success) {
           toast.success(res.message);
           setModalOpen(false);
@@ -48,21 +42,8 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
     }
   };
 
-  const columns: ColumnDef<TBlog>[] = [
-    // {
-    //   accessorKey: "bannerImage",
-    //   header: "Banner",
-    //   cell: ({ row }) =>
-    //     row.original.bannerImage ? (
-    //       <Image
-    //         src={row.original.bannerImage}
-    //         alt={row.original.title}
-    //         className="w-12 h-12 rounded object-cover"
-    //       />
-    //     ) : (
-    //       <span className="text-gray-500">No Image</span>
-    //     ),
-    // },
+
+  const columns = useMemo<ColumnDef<TBlog>[]>(() => [
     {
       accessorKey: "title",
       header: "Title",
@@ -113,14 +94,24 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
         </div>
       ),
     },
-  ];
+  ], [router]);
+
+
+  const table = useReactTable({
+    data: blogs || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row._id as string, 
+  });
 
   return (
     <div>
       <h1 className="text-xl font-bold mb-4">All Blogs</h1>
       <div className="overflow-x-auto">
-        <PortfolioTable columns={columns} data={blogs || []} />
+     
+        <PortfolioTable table={table} />
       </div>
+      
       <DeleteConfirmationModal
         name={selectedTitle}
         isOpen={isModalOpen}

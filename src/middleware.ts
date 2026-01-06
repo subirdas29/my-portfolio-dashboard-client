@@ -17,7 +17,8 @@ export const middleware = async(request:NextRequest)=>{
             return NextResponse.next()
         }
         else{
-            return NextResponse.redirect(new URL(`https://my-portfolio-dashboard-six.vercel.app/login?redirectPath=${pathname}`,request.url))
+            // return NextResponse.redirect(new URL(`https://my-portfolio-dashboard-six.vercel.app/login?redirectPath=${pathname}`,request.url))
+            return NextResponse.redirect(new URL(`http://localhost:3001/login?redirectPath=${pathname}`,request.url))
           
         }
     }
