@@ -5,6 +5,6 @@ export type TContact = {
     email: string;
     subject:string;
     message: string;
-
+  createdAt?: string;
   };
   

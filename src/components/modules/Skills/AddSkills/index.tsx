@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { ColumnDef, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table"; // getCoreRowModel এবং useReactTable আর লাগছে না এখানে
 import { Trash, GripVertical } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
@@ -24,7 +24,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import CreateSkillModal from "./AddSkillsModal";
-import { PortfolioTable } from "@/components/ui/core/PortfolioTable"; // Named Import
+import { PortfolioTable } from "@/components/ui/core/PortfolioTable"; 
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { TSkill } from "@/types/skills";
 import { deleteSkill, updateSkillOrder } from "@/services/Skills";
@@ -85,7 +85,13 @@ const ManageSkills = ({ skills: initialSkills }: { skills: TSkill[] }) => {
       header: "Skill Name",
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <Image src={row.original.logo[0]} alt={row.original.title} width={32} height={32} className="rounded-full" />
+          <Image 
+            src={row.original.logo[0]} 
+            alt={row.original.title} 
+            width={32} 
+            height={32} 
+            className="rounded-full" 
+          />
           <span className="font-medium">{row.original.title}</span>
         </div>
       ),
@@ -95,7 +101,7 @@ const ManageSkills = ({ skills: initialSkills }: { skills: TSkill[] }) => {
       header: "Action",
       cell: ({ row }) => (
         <button className="text-red-500" onClick={() => {
-          setSelectedId(row.original._id);
+          setSelectedId(row.original._id as string);
           setSelectedItem(row.original.title);
           setModalOpen(true);
         }}>
@@ -105,12 +111,7 @@ const ManageSkills = ({ skills: initialSkills }: { skills: TSkill[] }) => {
     },
   ], []);
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row._id as string,
-  });
+  // এখানে আমরা আর আলাদা করে table ইন্সট্যান্স বানাচ্ছি না কারণ PortfolioTable এর ভেতর এটা বানানো আছে
 
   return (
     <div>
@@ -121,7 +122,12 @@ const ManageSkills = ({ skills: initialSkills }: { skills: TSkill[] }) => {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={data.map((d) => d._id as string)} strategy={verticalListSortingStrategy}>
-          <PortfolioTable table={table} />
+          {/* গুরুত্বপূর্ণ পরিবর্তন: table={table} এর বদলে columns এবং data পাস করা হচ্ছে */}
+          <PortfolioTable 
+            columns={columns} 
+            data={data} 
+            isSortable={true} 
+          />
         </SortableContext>
       </DndContext>
 
