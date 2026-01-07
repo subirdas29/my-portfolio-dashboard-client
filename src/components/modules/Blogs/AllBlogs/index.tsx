@@ -9,10 +9,11 @@ import { useRouter } from "next/navigation";
 
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
-import { TBlog } from "@/types/blogs";
-import { deleteBlog } from "@/services/Blogs";
 
-const AllBlogsTable = ({ blogs }: { blogs: TBlog[] }) => {
+import { deleteBlog } from "@/services/Blogs";
+import { TBlogs } from "@/types/blogs";
+
+const AllBlogsTable = ({ blogs }: { blogs: TBlogs[] }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);

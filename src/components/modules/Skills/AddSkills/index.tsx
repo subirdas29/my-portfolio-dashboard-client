@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table"; // getCoreRowModel এবং useReactTable আর লাগছে না এখানে
+import { ColumnDef } from "@tanstack/react-table"; 
 import { Trash, GripVertical } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";

@@ -4,22 +4,43 @@
 import { revalidateTag } from "next/cache";
 
   // get all Contacts
-  export const getAllContacts = async (page?: string,limit?:string) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API}/messages?limit=${limit}&page=${page}`,
-        {
-          next: {
-            tags: ["Contact"],
-          },
-        }
-      );
-      const data = await res.json();
-      return data;
-    } catch (error: any) {
-      return Error(error.message);
-    }
-  };
+export const getAllContacts = async (params: Record<string, string | undefined>) => {
+  const queryString = new URLSearchParams(params as any).toString();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages?${queryString}`, {
+      next: { tags: ["Contact"] },
+    });
+    return await res.json();
+  } catch (error: any) {
+    return { success: false, data: [], meta: { total: 0, page: 1, limit: 10 } };
+  }
+};
+  // update Contact Status
+export const updateContactStatus = async (
+  contactId: string,
+  status: string
+): Promise<any> => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/messages/${contactId}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: (await cookies()).get("accessToken")?.value || "",
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+  
+    revalidateTag("Contact");
+    
+    return await res.json();
+  } catch (error: any) {
+    return Error(error.message);
+  }
+};
 
 
     // delete Contact

@@ -1,9 +1,13 @@
-export type TBlog = {
-    _id?:string
+export type TBlogs= {
     title: string;
-    category: string;
-    createdAt?: string;
+    summary: string;
     content: string;
-   
-  };
-  
+    featuredImage: string;
+    tags: string[];
+    categories: string[];
+    metadata: {
+        title: string;
+        description: string;
+    };
+    status: "published" | "draft";
+}
