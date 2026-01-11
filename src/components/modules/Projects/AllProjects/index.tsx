@@ -27,7 +27,7 @@ import {
 
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
-import { updateProjectOrder } from "@/services/Projects";
+import { deleteProject, updateProjectOrder } from "@/services/Projects";
 
 // Drag Handle Component
 const DragHandle = ({ id, disabled }: { id: string; disabled: boolean }) => {
@@ -98,6 +98,20 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
       }
     }
   };
+
+  const handleDeleteConfirm = async () => {
+      try {
+        if (selectedId) {
+          const res = await deleteProject(selectedId);
+          if (res.success) {
+            toast.success(res.message);
+            setModalOpen(false);
+          }
+        }
+      } catch (err) {
+        toast.error("Failed to delete Project.");
+      }
+    };
 
   const columns = useMemo<ColumnDef<TProjects>[]>(() => [
     {
@@ -203,10 +217,7 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
         name={selectedTitle}
         isOpen={isModalOpen}
         onOpenChange={setModalOpen}
-        onConfirm={() => {
-          
-            setModalOpen(false);
-        }}
+        onConfirm={handleDeleteConfirm}
       />
     </div>
   );

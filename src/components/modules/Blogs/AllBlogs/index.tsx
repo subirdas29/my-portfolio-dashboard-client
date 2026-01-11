@@ -145,7 +145,7 @@ const AllBlogsTable = ({ blogs }: { blogs: TBlogs[] }) => {
       cell: ({ row }) => (
         <div className="flex space-x-2">
         <a 
-  href={`https://your-other-site.com/blogs/${row.original._id}`} 
+  href={`https://subirdas-portfolio.vercel.app/all-blogs/blog-details/${row.original.slug}`} 
   target="_blank" 
   rel="noopener noreferrer"
   className="p-1.5 hover:bg-yellow-50 text-yellow-600 rounded-lg transition-colors inline-block"
