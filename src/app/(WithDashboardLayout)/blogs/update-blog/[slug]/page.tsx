@@ -5,10 +5,10 @@ import { getSingleBlog } from "@/services/Blogs"
 
 
 
-const blogDetailPage= async({params}:{params:Promise<{blogId:string}>}) => {
-    const {blogId} = await params
+const blogDetailPage= async({params}:{params:Promise<{slug:string}>}) => {
+    const {slug} = await params
 
-    const {data:blog} = await getSingleBlog(blogId)
+    const {data:blog} = await getSingleBlog(slug)
     console.log(blog,'blog')
 
   return (

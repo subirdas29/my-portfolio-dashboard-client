@@ -35,6 +35,24 @@
     color: rgba(120, 113, 108, 1);
   }
 
+
+
+.tiptap, .ProseMirror, .prose {
+  a {
+    color: #3b82f6 !important; 
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    cursor: pointer !important;
+
+    &:hover {
+      color: #1d4ed8 !important;
+      text-decoration: none !important;
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
   h1, h2, h3, h4, h5, h6 {
     // font-weight: bold;
   }

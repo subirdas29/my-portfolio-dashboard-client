@@ -68,7 +68,7 @@ const ManageSkills = ({ skills: initialSkills }: { skills: TSkill[] }) => {
       try {
         const res = await updateSkillOrder(orderPayload);
         if (res.success) toast.success("Order updated!");
-      } catch (err) {
+      } catch (err:any) {
         toast.error("Failed to update order");
       }
     }

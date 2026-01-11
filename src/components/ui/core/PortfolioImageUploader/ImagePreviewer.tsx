@@ -7,6 +7,7 @@ type TImagePreviewer = {
 
   imagePreview: string[]; 
   setImagePreview: React.Dispatch<React.SetStateAction<string[]>>;
+  setImageFiles: React.Dispatch<React.SetStateAction<File[]>>;
   className?: string;
 };
 

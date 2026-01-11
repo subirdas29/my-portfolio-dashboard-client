@@ -1,13 +1,22 @@
 export type TBlogs= {
+    _id?:string;
     title: string;
-    summary: string;
-    content: string;
-    featuredImage: string;
-    tags: string[];
-    categories: string[];
-    metadata: {
-        title: string;
-        description: string;
-    };
-    status: "published" | "draft";
+    slug: string;
+  content: string;
+  summary?: string;
+  featuredImage?: string;
+  tags?: string[];
+  category?: string;
+  status: 'draft' | 'published';
+  publishedAt?: Date;
+  meta?: {
+    views: number;
+    likes: number;
+  };
+  metadata: {
+    title: string;
+    description: string;
+  };
+  createdAt?:Date
+
 }

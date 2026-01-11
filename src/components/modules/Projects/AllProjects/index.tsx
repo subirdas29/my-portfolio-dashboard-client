@@ -27,7 +27,7 @@ import {
 
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
-import { deleteProject, updateProjectOrder } from "@/services/Projects";
+import { updateProjectOrder } from "@/services/Projects";
 
 // Drag Handle Component
 const DragHandle = ({ id, disabled }: { id: string; disabled: boolean }) => {
@@ -50,6 +50,8 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  console.log(selectedId)
   
   const router = useRouter();
 
@@ -91,7 +93,7 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
         if (res.success) {
           toast.success("Sequence updated!");
         }
-      } catch (err) {
+      } catch (err:any) {
         toast.error("Order update failed");
       }
     }
@@ -142,7 +144,7 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
           <button className="text-yellow-600" onClick={() => window.open(row.original.liveLink, "_blank")}>
             <Eye className="w-5 h-5" />
           </button>
-          <button className="text-green-500" onClick={() => router.push(`/projects/update-project/${row.original._id}`)}>
+          <button className="text-green-500" onClick={() => router.push(`/projects/update-project/${row.original.slug}`)}>
             <Edit className="w-5 h-5" />
           </button>
           <button className="text-red-500" onClick={() => {
@@ -162,7 +164,7 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h1 className="text-2xl font-black">Project Management</h1>
 
-        {/* ৩. ফিল্টার ড্রপডাউন UI */}
+     
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-400" />
           <select 
@@ -187,7 +189,7 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
           strategy={verticalListSortingStrategy}
         >
           <div className="overflow-x-auto">
-            {/* আমরা এখানে filteredData পাঠাচ্ছি */}
+       
             <PortfolioTable 
               columns={columns} 
               data={filteredData} 

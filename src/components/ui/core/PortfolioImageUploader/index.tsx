@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
 import { Input } from "../../input";
@@ -35,13 +36,13 @@ const PortfolioImageUploader = ({
         const response = await fetch(API_ENDPOINT, {
           method: "POST",
           body: formData,
-          // যদি আপনার ব্যাকএন্ডে টোকেন লাগে তবে Headers যোগ করবেন
+       
         });
 
         const result = await response.json();
 
         if (result.success) {
-          // ব্যাকএন্ড থেকে আসা URL (result.data) সেভ করছি
+        
           const finalUrl = result.data;
           console.log("Uploaded URL from Backend:", finalUrl);
 

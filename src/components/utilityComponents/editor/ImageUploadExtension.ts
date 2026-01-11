@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // components/ImageUploadExtension.ts
 import { Image } from "@tiptap/extension-image";
 import { toast } from "sonner";
 
-// আপনার ব্যাকএন্ড চেক করুন: ৫০০০ পোর্ট কি চালু আছে? 
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"; 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const UPLOAD_ENDPOINT = `${API_BASE_URL}/upload/image`; 

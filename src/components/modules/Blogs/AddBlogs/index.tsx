@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -39,11 +40,14 @@ export default function CreateBlog() {
   const [tags, setTags] = useState<string[]>([]);
   const [category, setCategory] = useState("");
 
-  // Image States (ব্যাকএন্ড থেকে আসা ক্লাউডিনারি URL এখানে থাকবে)
+
   const [featuredPreview, setFeaturedPreview] = useState<string[]>([]);  
+  const [imageFiles, setImageFiles] = useState<File[]>([]); 
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  console.log("Image Files:", imageFiles);
 
   // Validation Logic
   const validate = () => {
@@ -69,12 +73,13 @@ export default function CreateBlog() {
 
 
     const payload = {
+      
       title,
       summary,
       content,
       featuredImage: featuredPreview[0] || "", 
       tags,
-      categories: category ? [category] : [], 
+      category, 
       metadata: {
         title: metaTitle,
         description: metaDescription,
@@ -82,8 +87,11 @@ export default function CreateBlog() {
       status,
     };
 
+
+
     try {
       const res = await createBlogs(payload);
+   
       if (res.success) {
         toast.success(status === "draft" ? "Draft saved successfully!" : "Blog published!");
         router.push("/blogs/all-blogs");
@@ -127,7 +135,8 @@ export default function CreateBlog() {
               <Label>Featured Image (Cover) *</Label>
               <div className="mt-4">
                 <PortfolioImageUploader
-                  setImageFiles={() => {}} 
+                
+                  setImageFiles={setImageFiles}
                   setImagePreview={setFeaturedPreview}
                   label="Click to upload cover image (Max 4MB)"
                 />
@@ -135,6 +144,7 @@ export default function CreateBlog() {
               <ImagePreviewer
   imagePreview={featuredPreview}
   setImagePreview={setFeaturedPreview}
+  setImageFiles={setImageFiles}
   className="flex flex-wrap gap-6 mt-6"
 />
               </div>
@@ -240,7 +250,7 @@ export default function CreateBlog() {
 
             {/* 7. Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-8">
-              <Button
+              {/* <Button
                 variant="outline"
                 size="lg"
                 onClick={() => submit("draft")}
@@ -248,7 +258,7 @@ export default function CreateBlog() {
                 className="flex-1"
               >
                 {loading ? "Processing..." : "Save as Draft"}
-              </Button>
+              </Button> */}
               <Button
                 size="lg"
                 onClick={() => submit("published")}

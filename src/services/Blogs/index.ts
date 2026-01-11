@@ -67,10 +67,10 @@ export const getAllBlogs = async (page?: string,limit?:string) => {
 
 
           // get single blog
-export const getSingleBlog = async (blogId: string) => {
+export const getSingleBlog = async (slug: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/blogs/blog/${blogId}`,
+      `${process.env.NEXT_PUBLIC_BASE_API}/blogs/blog/${slug}`,
       {
         next: {
           tags: ["Blogs"],

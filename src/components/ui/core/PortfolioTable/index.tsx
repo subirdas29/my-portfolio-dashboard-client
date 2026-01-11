@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -10,18 +11,17 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-// ১. ড্র্যাগেবল রো কম্পোনেন্ট (শুধুমাত্র তখনই কাজ করবে যখন id থাকবে)
+
 const DraggableRow = ({ row, isSortable }: { row: any; isSortable: boolean }) => {
   const {
-    attributes,
-    listeners,
+    
     setNodeRef,
     transform,
     transition,
     isDragging,
   } = useSortable({ 
     id: row.original._id || row.id,
-    disabled: !isSortable // ড্র্যাগ অপশন অফ থাকলে এটি কাজ করবে না
+    disabled: !isSortable 
   });
 
   const style: React.CSSProperties = {
@@ -48,21 +48,20 @@ const DraggableRow = ({ row, isSortable }: { row: any; isSortable: boolean }) =>
   );
 };
 
-// ২. মেইন পোর্টফোলিও টেবিল
+
 interface PortfolioTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  isSortable?: boolean; // নতুন প্রপস: ড্র্যাগ হবে কি হবে না
+  isSortable?: boolean;
 }
 
 export function PortfolioTable<TData, TValue>({
   columns,
   data,
-  isSortable = false, // ডিফল্টভাবে ড্র্যাগ অফ থাকবে
+  isSortable = false,
 }: PortfolioTableProps<TData, TValue>) {
   
-  // তানস্ট্যাক টেবিল ইন্সট্যান্স এখানে তৈরি করা হয়েছে 
-  // যাতে আপনার পুরনো পেজগুলোতে (Blogs/Projects) কোনো পরিবর্তন না করতে হয়
+
   const table = useReactTable({
     data: data || [],
     columns,

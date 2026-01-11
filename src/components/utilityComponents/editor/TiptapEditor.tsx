@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -36,6 +38,7 @@ interface TiptapEditorProps {
   mode?: 'read' | 'write';
   content?: JSONContent | string;
   onContentChange?: (data: { html: string; json: JSONContent }) => void;
+  initialContent?: string;
   shadow?: boolean;
   noBorder?: boolean;
 }
@@ -44,6 +47,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
   mode = 'read',
   content,
   onContentChange,
+  initialContent,
   shadow = false,
   noBorder = false,
 }) => {
@@ -104,9 +108,15 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
       OrderedList,
       ListItem,
       Highlight,
-      Link.configure({
-        HTMLAttributes: { target: "_blank", rel: "noopener noreferrer" },
-      }),
+Link.configure({
+  autolink: true,
+  openOnClick: false,
+  HTMLAttributes: {
+    target: "_blank",
+    rel: "noopener noreferrer",
+    class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer', 
+  },
+}),
       Strike,
       Subscript,
       Superscript,
@@ -118,7 +128,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
       TableCell,
       Youtube.configure({ width: 640, height: 360 }),
     ],
-    content,
+    content: initialContent || content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       const json = editor.getJSON();
@@ -188,6 +198,14 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
       </select>
     );
   }
+
+useEffect(() => {
+  if (editor && initialContent) {
+    if (editor.getHTML() !== initialContent) {
+      editor.commands.setContent(initialContent);
+    }
+  }
+}, [editor, initialContent]);
 
   useEffect(() => {
     setSelectedAlignment(alignOptions[0]);
