@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 // components/ImageUploadExtension.ts
 import { Image } from "@tiptap/extension-image";
 import { toast } from "sonner";
-
+import imageCompression from 'browser-image-compression';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"; 
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const UPLOAD_ENDPOINT = `${API_BASE_URL}/upload/image`; 
 
 export const ImageUploadExtension = Image.extend({
@@ -14,23 +12,38 @@ export const ImageUploadExtension = Image.extend({
     return {
       setImage: (options: { src: string }) => ({ editor, commands }) => {
         const src = options.src;
+        
+   
         commands.insertContent({ type: "image", attrs: { src } });
 
+  
         if (!src.startsWith("data:image")) return true;
 
         (async () => {
+          // ১. ইউআই-তে লোডিং মেসেজ শুরু করা
+          const toastId = toast.loading("Optimizing & uploading image...");
+
           try {
-            console.log("⏳ Uploading image to backend...");
-            const blob = await fetch(src).then((r) => r.blob());
+            console.log("⏳ Processing image...");
+            
+            // ২. Base64 থেকে Blob এ কনভার্ট করা
+            const response = await fetch(src);
+            const originalFile = await response.blob();
 
-            if (blob.size > MAX_SIZE) {
-              toast.error("Image must be smaller than 10MB!");
-              removeNode(editor, src);
-              return;
-            }
+            // ৩. কমপ্রেশন সেটিংস (WebP conversion সহ)
+            const compressionOptions = {
+              maxSizeMB: 0.8,           // সর্বোচ্চ ৮০০ কেবি
+              maxWidthOrHeight: 1280,  // ব্লগের জন্য স্ট্যান্ডার্ড উইডথ
+              useWebWorker: true,
+              fileType: 'image/webp'   // WebP ফরম্যাটে রূপান্তর
+            };
 
+            // ৪. ইমেজ কমপ্রেশন কার্যকর করা
+            const compressedBlob = await imageCompression(originalFile as File, compressionOptions);
+
+            // ৫. FormData তৈরি করে ব্যাকএন্ডে পাঠানো
             const fd = new FormData();
-            fd.append("file", blob, "editor-blog-img.webp");
+            fd.append("file", compressedBlob, "blog-editor-image.webp");
 
             const res = await fetch(UPLOAD_ENDPOINT, { 
               method: "POST", 
@@ -42,16 +55,12 @@ export const ImageUploadExtension = Image.extend({
               throw new Error(errorData.message || "Upload failed");
             }
 
-            const data = await res.json();
+            const result = await res.json();
+            const finalURL = result.data; 
             
-            
-            console.log("✅ Cloudinary Response Data:", data);
-            
-            const finalURL = data.data; 
-            console.log("🚀 Final Image URL:", finalURL);
+            if (!finalURL) throw new Error("Cloudinary URL not found");
 
-            if (!finalURL) throw new Error("No URL found in response");
-
+            // ৬. এডিটরে থাকা Base64 ইমেজটি Cloudinary URL দিয়ে রিপ্লেস করা
             const { state, view } = editor;
             state.doc.descendants((node, pos) => {
               if (node.type.name === "image" && node.attrs?.src === src) {
@@ -61,10 +70,14 @@ export const ImageUploadExtension = Image.extend({
               return true;
             });
 
-            toast.success("Image uploaded to Cloudinary!");
+            // ৭. টোস্ট সাকসেস মেসেজে আপডেট করা
+            toast.success("Image uploaded successfully!", { id: toastId });
+
           } catch (err: any) {
-            console.error("❌ Image upload error:", err);
-            toast.error(err.message || "Connection refused to backend!");
+            console.error("❌ Upload error:", err);
+            
+            // ৮. এরর হলে টোস্ট আপডেট করা এবং এডিটর থেকে ইমেজ রিমুভ করা
+            toast.error(err.message || "Failed to upload image!", { id: toastId });
             removeNode(editor, src);
           }
         })();
@@ -75,10 +88,10 @@ export const ImageUploadExtension = Image.extend({
   },
 });
 
-
+// ইমেজ আপলোড ফেইল হলে সেটি এডিটর থেকে ডিলিট করার ফাংশন
 function removeNode(editor: any, src: string) {
   const { state, view } = editor;
-  state.doc.descendants((node:any, pos:any) => {
+  state.doc.descendants((node: any, pos: any) => {
     if (node.type.name === "image" && node.attrs?.src === src) {
       const tr = state.tr.deleteRange(pos, pos + node.nodeSize);
       view.dispatch(tr);
