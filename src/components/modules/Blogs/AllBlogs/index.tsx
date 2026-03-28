@@ -15,6 +15,7 @@ import { deleteBlog } from "@/services/Blogs";
 import { TBlogs } from "@/types/blogs";
 
 const AllBlogsTable = ({ blogs }: { blogs: TBlogs[] }) => {
+  console.log(blogs,'check')
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);

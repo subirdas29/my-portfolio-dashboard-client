@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import {
-  Bot,
- 
-  // Settings,
-  SquareTerminal,
+  LayoutDashboard,
+  FolderKanban,
+  Wrench,
+  FileText,
+  Mail,
 } from "lucide-react";
 
 import {
@@ -29,13 +30,13 @@ const data = {
     {
       title: "Dashboard",
       url: "/",
-      icon: SquareTerminal,
+      icon: LayoutDashboard,
       isActive: true,
     },
     {
       title: "Manage Projects",
       url: "/projects/all-projects",
-      icon: Bot,
+      icon: FolderKanban,
       items: [
         {
           title: "All Projects",
@@ -45,14 +46,12 @@ const data = {
           title: "Add Projects",
           url: "/projects/add-projects",
         },
-     
       ],
     },
-  
     {
       title: "Manage Skills",
       url: "/skills/add-skills",
-      icon: Bot,
+      icon: Wrench,
       items: [
         {
           title: "Skills",
@@ -60,36 +59,25 @@ const data = {
         },
       ],
     },
-    // {
-    //   title: "Manage Experience",
-    //   url: "/user/shop/products",
-    //   icon: Bot,
-    //   items: [
-    //     {
-    //       title: "Manage Products",
-    //       url: "/user/shop/products",
-    //     },
-    //   ],
-    // },
     {
       title: "Manage Blogs",
-      url: "/blogs/add-blog",
-      icon: Bot,
+      url: "/blogs/all-blogs",
+      icon: FileText,
       items: [
-        {
-          title: "Add Blogs",
-          url: "/blogs/add-blog",
-        },
         {
           title: "All Blogs",
           url: "/blogs/all-blogs",
+        },
+        {
+          title: "Add Blogs",
+          url: "/blogs/add-blog",
         },
       ],
     },
     {
       title: "Manage Contacts",
       url: "/contact",
-      icon: Bot,
+      icon: Mail,
       items: [
         {
           title: "All Contacts",
@@ -97,20 +85,7 @@ const data = {
         },
       ],
     },
-
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings,
-    //   items: [
-    //     {
-    //       title: "Profile",
-    //       url: "/profile",
-    //     },
-    //   ],
-    // },
   ],
-
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

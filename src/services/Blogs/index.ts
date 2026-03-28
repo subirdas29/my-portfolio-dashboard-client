@@ -24,22 +24,29 @@ export const createBlogs = async (Blog: TBlogs) => {
 
 
     // get all Blogs
-export const getAllBlogs = async (page?: string,limit?:string) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API}/blogs?limit=${limit}&page=${page}`,
-        {
-          next: {
-            tags: ["Blogs"],
-          },
-        }
-      );
-      const data = await res.json();
-      return data;
-    } catch (error: any) {
-      return Error(error.message);
-    }
-  };
+export const getAllBlogs = async (
+  page: string = "1",
+  limit: string = "10"
+) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/blogs?limit=${limit}&page=${page}`,
+      {
+        next: {
+          revalidate: 30,
+        },
+      }
+    );
+
+    console.log(res,'checkfsdfdsf')
+
+    const data = await res.json();
+    return data;
+  } catch (error: any) {
+    return Error(error.message);
+  }
+};
+
 
   // delete Blog
   export const deleteBlog = async (
