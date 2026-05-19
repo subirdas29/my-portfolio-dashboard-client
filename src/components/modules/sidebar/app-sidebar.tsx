@@ -7,6 +7,13 @@ import {
   Wrench,
   FileText,
   Mail,
+  Globe,
+  Users,
+  ShoppingBag,
+  Target,
+  Star,
+  Calendar,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -72,6 +79,10 @@ const data = {
           title: "Add Blogs",
           url: "/blogs/add-blog",
         },
+        {
+          title: "Blog Analytics",
+          url: "/blogs/analytics",
+        },
       ],
     },
     {
@@ -82,6 +93,76 @@ const data = {
         {
           title: "All Contacts",
           url: "/contact",
+        },
+      ],
+    },
+    {
+      title: "Clients & Orders",
+      url: "/clients",
+      icon: Users,
+      items: [
+        {
+          title: "Clients CRM",
+          url: "/clients",
+        },
+        {
+          title: "Orders",
+          url: "/orders",
+        },
+      ],
+    },
+    {
+      title: "Traffic Analytics",
+      url: "/traffic",
+      icon: Globe,
+      items: [
+        {
+          title: "Traffic Dashboard",
+          url: "/traffic",
+        },
+      ],
+    },
+    {
+      title: "Goal Tracker",
+      url: "/goals",
+      icon: Target,
+      items: [
+        {
+          title: "My Goals",
+          url: "/goals",
+        },
+      ],
+    },
+    {
+      title: "Testimonials",
+      url: "/testimonials",
+      icon: Star,
+      items: [
+        {
+          title: "Manage Testimonials",
+          url: "/testimonials",
+        },
+      ],
+    },
+    {
+      title: "Calendar",
+      url: "/calendar",
+      icon: Calendar,
+      items: [
+        {
+          title: "Deadlines & Events",
+          url: "/calendar",
+        },
+      ],
+    },
+    {
+      title: "Settings",
+      url: "/settings",
+      icon: Settings,
+      items: [
+        {
+          title: "Profile & Config",
+          url: "/settings",
         },
       ],
     },

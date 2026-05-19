@@ -15,7 +15,7 @@ export const createProjects = async (projects: TProjects) => {
         },
         body: JSON.stringify(projects),
       });
-      revalidateTag("Projects");
+      revalidateTag("Projects", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);
@@ -78,7 +78,7 @@ export const getSingleProject = async (slug: string) => {
           body: JSON.stringify(projectData),
         }
       );
-      revalidateTag("Projects");
+      revalidateTag("Projects", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);
@@ -104,7 +104,7 @@ export const getSingleProject = async (slug: string) => {
       }
   
     
-      revalidateTag("Projects");
+      revalidateTag("Projects", "");
       
       return await res.json();
     } catch (error: any) {
@@ -130,7 +130,7 @@ export const deleteProject = async (
           
         }
       );
-      revalidateTag("Projects");
+      revalidateTag("Projects", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);

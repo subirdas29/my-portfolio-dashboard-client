@@ -4,7 +4,7 @@
 import { revalidateTag } from "next/cache";
 
   // get all Contacts
-export const getAllContacts = async (params: Record<string, string | undefined>) => {
+export const getAllContacts = async (params: Record<string, string | undefined | boolean>) => {
   const queryString = new URLSearchParams(params as any).toString();
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages?${queryString}`, {
@@ -34,7 +34,7 @@ export const updateContactStatus = async (
     );
 
   
-    revalidateTag("Contact");
+    revalidateTag("Contact", "");
     
     return await res.json();
   } catch (error: any) {
@@ -42,6 +42,71 @@ export const updateContactStatus = async (
   }
 };
 
+
+    // reply to Contact via email
+  export const replyToContact = async (
+    contactId: string,
+    reply: string
+  ): Promise<any> => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/messages/${contactId}/reply`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reply }),
+        }
+      );
+      revalidateTag("Contact", "");
+      return await res.json();
+    } catch (error: any) {
+      return Error(error.message);
+    }
+  };
+
+  // toggle priority
+  export const togglePriority = async (id: string): Promise<any> => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages/${id}/priority`, { method: 'PATCH' });
+      revalidateTag('Contact', "");
+      return await res.json();
+    } catch (e: any) { return Error(e.message); }
+  };
+
+  // toggle spam
+  export const toggleSpam = async (id: string): Promise<any> => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages/${id}/spam`, { method: 'PATCH' });
+      revalidateTag('Contact', "");
+      return await res.json();
+    } catch (e: any) { return Error(e.message); }
+  };
+
+  // bulk status update
+  export const bulkUpdateStatus = async (ids: string[], status: string): Promise<any> => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages/bulk/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids, status }),
+      });
+      revalidateTag('Contact', "");
+      return await res.json();
+    } catch (e: any) { return Error(e.message); }
+  };
+
+  // bulk delete
+  export const bulkDelete = async (ids: string[]): Promise<any> => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/messages/bulk/delete`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids }),
+      });
+      revalidateTag('Contact', "");
+      return await res.json();
+    } catch (e: any) { return Error(e.message); }
+  };
 
     // delete Contact
   export const deleteContact = async (
@@ -60,7 +125,7 @@ export const updateContactStatus = async (
             
           }
         );
-        revalidateTag("Contact");
+        revalidateTag("Contact", "");
         return await res.json();
       } catch (error: any) {
         return Error(error);

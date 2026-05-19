@@ -151,6 +151,25 @@ const AllProjectsTable = ({ projects: initialProjects }: { projects: TProjects[]
       ),
     },
     {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status || "Deployed";
+        const colors: Record<string, string> = {
+          Planning: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+          "In Progress": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+          Completed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+          Deployed: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+          Archived: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+        };
+        return (
+          <span className={`text-xs font-semibold px-2 py-1 rounded ${colors[status] || colors.Deployed}`}>
+            {status}
+          </span>
+        );
+      },
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (

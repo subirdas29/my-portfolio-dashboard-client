@@ -48,8 +48,11 @@ const UpdateBlog = ({ blog }: { blog: TBlogs}) => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-    const [imageFiles, setImageFiles] = useState<File[]>([]); 
-    console.log("Image Files:", imageFiles);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [scheduledAt, setScheduledAt] = useState(
+    blog.publishedAt ? new Date(blog.publishedAt).toISOString().slice(0, 16) : ""
+  );
+  console.log("Image Files:", imageFiles);
 
   // Validation Logic
   const validate = () => {
@@ -90,6 +93,7 @@ const UpdateBlog = ({ blog }: { blog: TBlogs}) => {
         description: metaDescription,
       },
       status,
+      ...(scheduledAt && { publishedAt: new Date(scheduledAt).toISOString() }),
     };
 
     try {
@@ -250,7 +254,25 @@ const UpdateBlog = ({ blog }: { blog: TBlogs}) => {
               </div>
             </div>
 
-            {/* 7. Action Buttons */}
+            {/* 7. Schedule / Action */}
+            <div className="rounded-2xl border p-5 bg-gray-50 dark:bg-gray-900/30 space-y-3">
+              <label className="block text-sm font-semibold">Schedule Publish (optional)</label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <input
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  className="text-sm px-3 py-2 rounded-xl border bg-white dark:bg-gray-800 outline-none"
+                />
+                {scheduledAt && (
+                  <button onClick={() => setScheduledAt("")} className="text-xs text-red-500 hover:underline">Clear</button>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {scheduledAt ? `Publish at: ${new Date(scheduledAt).toLocaleString()}` : "Leave empty to keep current date."}
+                </p>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 pt-8">
               <Button
                 size="lg"

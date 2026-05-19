@@ -3,15 +3,62 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Trash, Eye, CheckCircle2, AlertCircle, Calendar, Phone, Mail, User, X, ChevronLeft, ChevronRight, RotateCcw, Database, Filter, MessageSquareText } from "lucide-react";
+import { Trash, Eye, CheckCircle2, AlertCircle, Calendar, Phone, Mail, User, X, ChevronLeft, ChevronRight, RotateCcw, Database, Filter, MessageSquareText, UserPlus, Send, Download } from "lucide-react";
+import { exportToCsv } from "@/lib/exportCsv";
 import { useState } from "react";
 import { PortfolioTable } from "@/components/ui/core/PortfolioTable";
 import DeleteConfirmationModal from "@/components/ui/core/PortfolioModal/DeleteConfirmationModal";
 import { toast } from "sonner";
 import { TContact } from "@/types/contacts";
-import { deleteContact, updateContactStatus } from "@/services/contacts";
+import { deleteContact, updateContactStatus, replyToContact, togglePriority, toggleSpam, bulkUpdateStatus, bulkDelete } from "@/services/contacts";
+import { createClient } from "@/services/Clients";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
+
+// --- Reply Component ---
+const ReplyBox = ({ contact }: { contact: TContact }) => {
+    const [reply, setReply] = useState("");
+    const [sending, setSending] = useState(false);
+
+    const handleSend = async () => {
+        if (!reply.trim()) return;
+        setSending(true);
+        try {
+            const res = await replyToContact(contact._id!, reply);
+            if (res?.success !== false) {
+                toast.success(`Reply sent to ${contact.email}`);
+                setReply("");
+            } else {
+                toast.error("Failed to send reply");
+            }
+        } catch {
+            toast.error("Network error");
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">Reply via Email</p>
+            <textarea
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                placeholder={`Write your reply to ${contact.name}...`}
+                rows={3}
+                className="w-full rounded-2xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+            <button
+                onClick={handleSend}
+                disabled={sending || !reply.trim()}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all disabled:opacity-50"
+            >
+                <Send className="w-4 h-4" />
+                {sending ? "Sending..." : `Send to ${contact.email}`}
+            </button>
+        </div>
+    );
+};
 
 // --- Detail View Modal (Updated with Scrollable Message) ---
 const ViewMessageModal = ({ data, isOpen, onClose }: { data: TContact | null, isOpen: boolean, onClose: () => void }) => {
@@ -75,10 +122,16 @@ const ViewMessageModal = ({ data, isOpen, onClose }: { data: TContact | null, is
                     </div>
                 </div>
 
+                {/* Reply Box */}
+                <div className="px-8 pb-4">
+                    <ReplyBox contact={data} />
+                </div>
+
                 {/* Modal Footer */}
-                <div className="p-6 flex justify-end bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-800">
-                    <button 
-                        onClick={onClose} 
+                <div className="p-6 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-800">
+                    <ConvertToClientButton contact={data} onClose={onClose} />
+                    <button
+                        onClick={onClose}
                         className="px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all"
                     >
                         Done Reading
@@ -89,10 +142,56 @@ const ViewMessageModal = ({ data, isOpen, onClose }: { data: TContact | null, is
     );
 };
 
+const ConvertToClientButton = ({ contact, onClose }: { contact: TContact | null; onClose: () => void }) => {
+    const router = useRouter();
+    const [converting, setConverting] = useState(false);
+
+    if (!contact) return null;
+
+    const handleConvert = async () => {
+        setConverting(true);
+        try {
+            const res = await createClient({
+                name: contact.name,
+                email: contact.email,
+                phone: contact.phone,
+                status: 'Lead',
+                source: 'contact_form',
+                notes: `Subject: ${contact.subject}\n\n${contact.message}`,
+                linkedMessageId: contact._id,
+            } as Parameters<typeof createClient>[0]);
+            if (res?.success !== false) {
+                toast.success(`${contact.name} added to Clients!`);
+                onClose();
+                router.push('/clients');
+            } else {
+                toast.error('Failed to convert. Client may already exist.');
+            }
+        } catch {
+            toast.error('Conversion failed.');
+        } finally {
+            setConverting(false);
+        }
+    };
+
+    return (
+        <button
+            onClick={handleConvert}
+            disabled={converting}
+            className="flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all disabled:opacity-60"
+        >
+            <UserPlus className="w-4 h-4" />
+            {converting ? 'Converting...' : 'Convert to Client'}
+        </button>
+    );
+};
+
 const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) => {
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const [isViewModalOpen, setViewModalOpen] = useState(false);
     const [selectedContact, setSelectedContact] = useState<TContact | null>(null);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [bulkStatus, setBulkStatus] = useState("Replied");
 
     const router = useRouter();
     const pathname = usePathname();
@@ -120,7 +219,57 @@ const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) =
         } catch (error) { toast.error("Update failed", { id: toastId }); }
     };
 
+    const handleTogglePriority = async (id: string) => {
+        await togglePriority(id);
+        toast.success("Priority toggled");
+        router.refresh();
+    };
+
+    const handleToggleSpam = async (id: string) => {
+        await toggleSpam(id);
+        toast.success("Spam toggled");
+        router.refresh();
+    };
+
+    const handleBulkStatus = async () => {
+        if (!selectedIds.length) return;
+        await bulkUpdateStatus(selectedIds, bulkStatus);
+        toast.success(`${selectedIds.length} contacts → ${bulkStatus}`);
+        setSelectedIds([]);
+        router.refresh();
+    };
+
+    const handleBulkDelete = async () => {
+        if (!selectedIds.length) return;
+        if (!confirm(`Delete ${selectedIds.length} contacts?`)) return;
+        await bulkDelete(selectedIds);
+        toast.success(`${selectedIds.length} contacts deleted`);
+        setSelectedIds([]);
+        router.refresh();
+    };
+
+    const toggleSelectId = (id: string) => {
+        setSelectedIds((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]);
+    };
+
     const columns: ColumnDef<TContact>[] = [
+        {
+            id: "select",
+            header: () => (
+                <input type="checkbox"
+                    checked={selectedIds.length === contact.length && contact.length > 0}
+                    onChange={(e) => setSelectedIds(e.target.checked ? contact.map((c) => c._id!).filter(Boolean) : [])}
+                    className="w-4 h-4 rounded cursor-pointer"
+                />
+            ),
+            cell: ({ row }) => (
+                <input type="checkbox"
+                    checked={selectedIds.includes(row.original._id!)}
+                    onChange={() => toggleSelectId(row.original._id!)}
+                    className="w-4 h-4 rounded cursor-pointer"
+                />
+            ),
+        },
         {
             accessorKey: "createdAt",
             header: "Date",
@@ -172,6 +321,24 @@ const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) =
             )
         },
         {
+            id: "flags",
+            header: "Flags",
+            cell: ({ row }) => (
+                <div className="flex items-center gap-1">
+                    <button
+                        title="Priority"
+                        onClick={() => handleTogglePriority(row.original._id!)}
+                        className={`p-1.5 rounded-lg text-xs font-bold transition-colors ${row.original.priority ? "bg-amber-400 text-white" : "bg-gray-100 text-gray-400 hover:bg-amber-100"}`}
+                    >⭐</button>
+                    <button
+                        title="Spam"
+                        onClick={() => handleToggleSpam(row.original._id!)}
+                        className={`p-1.5 rounded-lg text-xs font-bold transition-colors ${row.original.spam ? "bg-red-400 text-white" : "bg-gray-100 text-gray-400 hover:bg-red-100"}`}
+                    >🚫</button>
+                </div>
+            )
+        },
+        {
             id: "actions",
             header: "Action",
             cell: ({ row }) => (
@@ -193,6 +360,7 @@ const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) =
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
                     <div>
                         <h1 className="text-3xl font-black italic tracking-tighter">Client CRM</h1>
+
                         <div className="flex flex-wrap gap-3 mt-4">
                             <div className="flex items-center gap-2 bg-gray-900 text-white px-4 py-1.5 rounded-2xl text-xs font-bold shadow-md">
                                 <Database className="w-3.5 h-3.5 text-amber-400"/> Total: {meta?.total || 0}
@@ -206,12 +374,34 @@ const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) =
                         </div>
                     </div>
 
+                    <div className="flex flex-wrap items-center gap-2">
+                        <button
+                            onClick={() => exportToCsv("contacts.csv", contact.map((c) => ({
+                                Name: c.name, Email: c.email, Phone: c.phone,
+                                Subject: c.subject, Status: c.status, Date: c.createdAt ?? "",
+                            })))}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold transition-all"
+                        >
+                            <Download className="w-3.5 h-3.5" /> Export CSV
+                        </button>
+                    </div>
                     <div className="flex flex-wrap items-center gap-2 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-3xl border shadow-inner">
+                        {/* Priority / Spam quick filter */}
+                        <div className="flex items-center gap-1.5 border-r pr-3">
+                            <button
+                                onClick={() => updateQuery({ priority: searchParams.get("priority") === "true" ? undefined : "true", spam: undefined })}
+                                className={`text-[10px] font-black px-2 py-1 rounded-lg transition-colors ${searchParams.get("priority") === "true" ? "bg-amber-400 text-white" : "bg-white dark:bg-gray-800 border text-gray-500 hover:bg-amber-50"}`}
+                            >⭐ PRIORITY</button>
+                            <button
+                                onClick={() => updateQuery({ spam: searchParams.get("spam") === "true" ? undefined : "true", priority: undefined, status: undefined })}
+                                className={`text-[10px] font-black px-2 py-1 rounded-lg transition-colors ${searchParams.get("spam") === "true" ? "bg-red-400 text-white" : "bg-white dark:bg-gray-800 border text-gray-500 hover:bg-red-50"}`}
+                            >🚫 SPAM</button>
+                        </div>
                         <div className="flex items-center gap-2 border-r pr-3">
                             <Filter className="w-3 h-3 text-gray-400" />
-                            <select 
-                                value={searchParams.get("status") || ""} 
-                                onChange={(e) => updateQuery({ status: e.target.value })}
+                            <select
+                                value={searchParams.get("status") || ""}
+                                onChange={(e) => updateQuery({ status: e.target.value, spam: undefined, priority: undefined })}
                                 className="bg-transparent text-[11px] font-black uppercase outline-none cursor-pointer"
                             >
                                 <option value="">ALL STATUS</option>
@@ -258,6 +448,23 @@ const ManageContacts = ({ contact, meta }: { contact: TContact[], meta: any }) =
                 </div>
 
                 <div className="rounded-[1.5rem] overflow-hidden border border-gray-50">
+                    {/* Bulk Action Bar */}
+                    {selectedIds.length > 0 && (
+                        <div className="flex items-center gap-3 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+                            <span className="text-sm font-bold text-blue-700 dark:text-blue-400">{selectedIds.length} selected</span>
+                            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)}
+                                className="text-xs px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-800 outline-none">
+                                <option value="Replied">Replied</option>
+                                <option value="Dealing">Dealing</option>
+                                <option value="Booked">Booked</option>
+                                <option value="Closed">Closed</option>
+                                <option value="No Response">No Response</option>
+                            </select>
+                            <button onClick={handleBulkStatus} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg">Apply Status</button>
+                            <button onClick={handleBulkDelete} className="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg">Delete All</button>
+                            <button onClick={() => setSelectedIds([])} className="px-3 py-1.5 bg-gray-200 text-gray-700 text-xs font-bold rounded-lg">Clear</button>
+                        </div>
+                    )}
                     <PortfolioTable columns={columns} data={contact} />
                 </div>
 

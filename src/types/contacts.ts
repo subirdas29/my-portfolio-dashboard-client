@@ -6,6 +6,8 @@ export type TContact = {
     subject:string;
     message: string;
     status:"Pending" | "Replied" | "No Response" | "Dealing" | "Booked" | "Closed";
-  createdAt?: string;
+    priority?: boolean;
+    spam?: boolean;
+    createdAt?: string;
   };
   

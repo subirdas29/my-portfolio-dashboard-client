@@ -25,6 +25,8 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
     const [tags, setTags] = useState<string[]>(project?.technologies || []);
     const router = useRouter();
 
+    const [isClientProject, setIsClientProject] = useState(project?.isClientProject ?? false);
+
     const form = useForm<TProjects>({
         defaultValues: {
             title: project?.title || "",
@@ -36,7 +38,12 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
             clientGithubLink: project?.clientGithubLink || "",
             serverGithubLink: project?.serverGithubLink || "",
             technologies: project?.technologies || [],
-            imageUrls: project?.imageUrls || []
+            imageUrls: project?.imageUrls || [],
+            status: project?.status || "Deployed",
+            startDate: project?.startDate || "",
+            endDate: project?.endDate || "",
+            clientName: project?.clientName || "",
+            clientEmail: project?.clientEmail || "",
         }
     });
 
@@ -54,8 +61,9 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
 
             const projectData: TProjects = {
                 ...data,
-                imageUrls: imagePreview, 
-                technologies: tags
+                imageUrls: imagePreview,
+                technologies: tags,
+                isClientProject,
             };
 
             const res = await updateProject(projectData, project._id);
@@ -221,6 +229,69 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
                                 imagePreview={imagePreview}
                                 setImagePreview={setImagePreview}
                             />
+                        </div>
+                    </div>
+
+                    {/* Status & Client Info */}
+                    <div className="border rounded-2xl p-5 space-y-4 bg-gray-50 dark:bg-gray-900/30">
+                        <h3 className="text-sm font-semibold">Project Status & Client Info</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="status" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <select {...field} className="w-full h-9 px-3 rounded-md border bg-background text-sm">
+                                        <option value="Planning">Planning</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Deployed">Deployed</option>
+                                        <option value="Archived">Archived</option>
+                                    </select>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <div className="space-y-1 flex flex-col justify-end pb-1">
+                                <label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                                    <div
+                                        className={`relative w-9 h-5 rounded-full transition-colors ${isClientProject ? "bg-blue-500" : "bg-muted"}`}
+                                        onClick={() => setIsClientProject(v => !v)}
+                                    >
+                                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${isClientProject ? "translate-x-4" : ""}`} />
+                                    </div>
+                                    Client Project
+                                </label>
+                            </div>
+                            <FormField control={form.control} name="startDate" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Start Date</FormLabel>
+                                    <input type="date" {...field} value={field.value ? String(field.value).slice(0, 10) : ""} className="w-full h-9 px-3 rounded-md border bg-background text-sm" />
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="endDate" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>End Date</FormLabel>
+                                    <input type="date" {...field} value={field.value ? String(field.value).slice(0, 10) : ""} className="w-full h-9 px-3 rounded-md border bg-background text-sm" />
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            {isClientProject && (
+                                <>
+                                    <FormField control={form.control} name="clientName" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Client Name</FormLabel>
+                                            <Input {...field} placeholder="Client name" />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                    <FormField control={form.control} name="clientEmail" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Client Email</FormLabel>
+                                            <Input {...field} type="email" placeholder="client@email.com" />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                </>
+                            )}
                         </div>
                     </div>
 

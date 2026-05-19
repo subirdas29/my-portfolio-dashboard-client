@@ -217,6 +217,22 @@ export default function AddProjectForm() {
                         </div>
                     </div>
 
+                    {/* Status field */}
+                    <div className="border rounded-2xl p-4 bg-gray-50 dark:bg-gray-900/30">
+                        <label className="block text-sm font-semibold mb-2">Project Status</label>
+                        <select
+                            {...form.register("status")}
+                            defaultValue="Deployed"
+                            className="w-full h-9 px-3 rounded-md border bg-background text-sm"
+                        >
+                            <option value="Planning">Planning</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Deployed">Deployed</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
+
                     <Button type="submit" className="w-full h-12 text-lg font-semibold" disabled={isSubmitting}>
                         {isSubmitting ? "Creating Project..." : "Create Project"}
                     </Button>

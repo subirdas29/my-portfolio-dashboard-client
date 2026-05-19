@@ -1,23 +1,25 @@
 import ManageContacts from "@/components/modules/Contacts";
 import { getAllContacts } from "@/services/contacts";
 
-const ContactPage = async ({ 
-    searchParams 
-}: { 
-    searchParams: Promise<{ page?: string; status?: string; createdAt?: string; range?: string }> 
+const ContactPage = async ({
+    searchParams
+}: {
+    searchParams: Promise<{ page?: string; status?: string; createdAt?: string; range?: string; spam?: string; priority?: string }>
 }) => {
     const params = await searchParams;
-    
+
 
     const query: Record<string, string> = {
         page: params.page || "1",
         limit: "10",
     };
 
-   
+
     if (params.status) query.status = params.status;
     if (params.createdAt) query.createdAt = params.createdAt;
-    if (params.range) query.range = params.range; 
+    if (params.range) query.range = params.range;
+    if (params.spam) query.spam = params.spam;
+    if (params.priority) query.priority = params.priority;
 
     const response = await getAllContacts(query);
 

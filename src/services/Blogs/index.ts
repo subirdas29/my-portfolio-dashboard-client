@@ -15,7 +15,7 @@ export const createBlogs = async (Blog: TBlogs) => {
         },
         body: JSON.stringify(Blog),
       });
-      revalidateTag("Blogs");
+      revalidateTag("Blogs", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);
@@ -65,7 +65,7 @@ export const getAllBlogs = async (
           
         }
       );
-      revalidateTag("Blogs");
+      revalidateTag("Blogs", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);
@@ -111,7 +111,7 @@ export const getSingleBlog = async (slug: string) => {
           body: JSON.stringify(blogData),
         }
       );
-      revalidateTag("Blogs");
+      revalidateTag("Blogs", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);

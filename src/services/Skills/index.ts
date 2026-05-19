@@ -14,7 +14,7 @@ export const createSkills = async (skills: TSkill) => {
         },
         body: JSON.stringify(skills),
       });
-      revalidateTag("Skills");
+      revalidateTag("Skills", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);
@@ -60,7 +60,7 @@ export const updateSkillOrder = async (
     }
 
   
-    revalidateTag("Skills");
+    revalidateTag("Skills", "");
     
     return await res.json();
   } catch (error: any) {
@@ -85,7 +85,7 @@ export const deleteSkill = async (
           
         }
       );
-      revalidateTag("Skills");
+      revalidateTag("Skills", "");
       return await res.json();
     } catch (error: any) {
       return Error(error);

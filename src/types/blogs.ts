@@ -8,7 +8,7 @@ export type TBlogs= {
   tags?: string[];
   category?: string;
   status: 'draft' | 'published';
-  publishedAt?: Date;
+  publishedAt?: Date | string;
   meta?: {
     views: number;
     likes: number;
