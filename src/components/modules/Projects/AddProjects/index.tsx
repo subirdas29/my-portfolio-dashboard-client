@@ -35,6 +35,7 @@ export default function AddProjectForm() {
             liveLink: "",
             clientGithubLink: "",
             serverGithubLink: "",
+            videoUrl: "",
             technologies: [],
             imageUrls: []
         }
@@ -191,6 +192,13 @@ export default function AddProjectForm() {
                                 <FormItem>
                                     <FormLabel>Server GitHub</FormLabel>
                                     <FormControl><Input {...field} placeholder="https://github.com/..." /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="videoUrl" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Demo Video URL (YouTube)</FormLabel>
+                                    <FormControl><Input {...field} placeholder="https://youtube.com/watch?v=..." /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />

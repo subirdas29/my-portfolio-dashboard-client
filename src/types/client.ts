@@ -10,6 +10,7 @@ export type TClient = {
   country?: string;
   status: TClientStatus;
   source?: TClientSource;
+  logo?: string;
   notes?: string;
   tags?: string[];
   linkedMessageId?: string;

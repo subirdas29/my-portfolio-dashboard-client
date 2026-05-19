@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Target,
   Star,
+  Award,
   Calendar,
   Settings,
 } from "lucide-react";
@@ -130,6 +131,23 @@ const data = {
         {
           title: "My Goals",
           url: "/goals",
+        },
+      ],
+    },
+    {
+      title: "Newsletter",
+      url: "/newsletter",
+      icon: Mail,
+      items: [{ title: "Subscribers", url: "/newsletter" }],
+    },
+    {
+      title: "Certifications",
+      url: "/certifications",
+      icon: Award,
+      items: [
+        {
+          title: "Manage Certifications",
+          url: "/certifications",
         },
       ],
     },

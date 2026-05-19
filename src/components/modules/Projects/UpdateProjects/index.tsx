@@ -37,6 +37,7 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
             liveLink: project?.liveLink || "",
             clientGithubLink: project?.clientGithubLink || "",
             serverGithubLink: project?.serverGithubLink || "",
+            videoUrl: project?.videoUrl || "",
             technologies: project?.technologies || [],
             imageUrls: project?.imageUrls || [],
             status: project?.status || "Deployed",
@@ -205,6 +206,13 @@ export default function UpdateProjectForm({ project }: { project: TProjects }) {
                                 <FormItem>
                                     <FormLabel>Server GitHub</FormLabel>
                                     <FormControl><Input {...field} placeholder="https://github.com/..." /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                            <FormField control={form.control} name="videoUrl" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Demo Video URL (YouTube)</FormLabel>
+                                    <FormControl><Input {...field} placeholder="https://youtube.com/watch?v=..." /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />

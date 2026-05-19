@@ -78,6 +78,7 @@ export default function ClientsPage({
       country: fd.get("country") as string,
       status: (fd.get("status") as TClientStatus) || "Lead",
       source: (fd.get("source") as TClient["source"]) || "other",
+      logo: (fd.get("logo") as string) || undefined,
       notes: fd.get("notes") as string,
     };
     const res = await createClient(payload);
@@ -99,6 +100,7 @@ export default function ClientsPage({
       notes: fd.get("notes") as string,
       phone: fd.get("phone") as string,
       company: fd.get("company") as string,
+      logo: (fd.get("logo") as string) || undefined,
     };
     const res = await updateClient(editClient._id, payload);
     if (res?.success !== false) {
@@ -362,6 +364,11 @@ function ClientForm({
             <option value="other">Other</option>
           </select>
         </div>
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="logo">Company Logo URL</Label>
+        <Input id="logo" name="logo" type="url" placeholder="https://..." defaultValue={defaultValues?.logo} />
+        <p className="text-xs text-muted-foreground">Used in portfolio client showcase carousel</p>
       </div>
       <div className="space-y-1">
         <Label htmlFor="notes">Notes</Label>

@@ -15,6 +15,7 @@ export type TProjects = {
     clientGithubLink?: string;
     serverGithubLink?: string;
     imageUrls: string[];
+    videoUrl?: string;
     status?: TProjectStatus;
     startDate?: string;
     endDate?: string;
