@@ -478,9 +478,9 @@ export default function DashboardOverview({
                       innerRadius={30}
                       outerRadius={55}
                     >
-                      {analyticsStats.deviceBreakdown.map((entry) => (
+                      {analyticsStats.deviceBreakdown.map((entry, i) => (
                         <Cell
-                          key={entry.device}
+                          key={`${entry.device}-${i}`}
                           fill={DEVICE_COLORS[entry.device] || "#94a3b8"}
                         />
                       ))}
@@ -488,8 +488,8 @@ export default function DashboardOverview({
                     <Tooltip contentStyle={{ fontSize: 12 }} />
                   </PieChart>
                 </ResponsiveContainer>
-                {analyticsStats.deviceBreakdown.map((d) => (
-                  <div key={d.device} className="flex items-center justify-between text-sm">
+                {analyticsStats.deviceBreakdown.map((d, i) => (
+                  <div key={`${d.device}-${i}`} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <div
                         className="w-2.5 h-2.5 rounded-full"

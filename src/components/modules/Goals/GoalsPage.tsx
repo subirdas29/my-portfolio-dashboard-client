@@ -120,13 +120,22 @@ export default function GoalsPage({
     e.preventDefault();
     if (!editGoal) return;
     const fd = new FormData(e.currentTarget);
+    const currentVal = Number(fd.get("current"));
+    const targetVal = Number(fd.get("target"));
     await updateGoal(editGoal._id, {
-      current: Number(fd.get("current")),
-      target: Number(fd.get("target")),
+      current: currentVal,
+      target: targetVal,
       notes: fd.get("notes") as string,
+      completed: currentVal >= targetVal,
     });
     toast.success("Goal updated");
     setEditGoal(null);
+    startTransition(() => router.refresh());
+  };
+
+  const handleToggleComplete = async (goal: TGoal) => {
+    await updateGoal(goal._id, { completed: !goal.completed });
+    toast.success(goal.completed ? "Marked as in progress" : "Marked as completed!");
     startTransition(() => router.refresh());
   };
 
@@ -309,25 +318,37 @@ export default function GoalsPage({
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Update Goal</DialogTitle>
+                          <DialogTitle>Update Goal — {goal.title}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleUpdate} className="space-y-4">
                           <div className="space-y-1">
                             <Label>Current Progress</Label>
-                            <Input name="current" type="number" defaultValue={goal.current} />
+                            <Input name="current" type="number" defaultValue={goal.current} min={0} />
                           </div>
                           <div className="space-y-1">
                             <Label>Target</Label>
-                            <Input name="target" type="number" defaultValue={goal.target} />
+                            <Input name="target" type="number" defaultValue={goal.target} min={1} />
                           </div>
                           <div className="space-y-1">
                             <Label>Notes</Label>
-                            <Input name="notes" defaultValue={goal.notes} />
+                            <Input name="notes" defaultValue={goal.notes} placeholder="Optional notes..." />
                           </div>
+                          <p className="text-xs text-muted-foreground">
+                            💡 Goal auto-marks completed when current ≥ target
+                          </p>
                           <Button type="submit" className="w-full">Save Changes</Button>
                         </form>
                       </DialogContent>
                     </Dialog>
+                    <Button
+                      variant={goal.completed ? "outline" : "ghost"}
+                      size="sm"
+                      title={goal.completed ? "Mark as In Progress" : "Mark as Completed"}
+                      className={`h-7 w-7 p-0 ${goal.completed ? "text-emerald-600 border-emerald-300" : "text-muted-foreground hover:text-emerald-600"}`}
+                      onClick={() => handleToggleComplete(goal)}
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

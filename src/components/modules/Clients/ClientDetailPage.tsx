@@ -54,7 +54,7 @@ export default function ClientDetailPage({
   const { client, orders, stats, linkedMessage } = data;
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 w-full">
       {/* Header */}
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-2 mb-2">

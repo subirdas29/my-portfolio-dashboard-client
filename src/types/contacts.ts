@@ -8,6 +8,8 @@ export type TContact = {
     status:"Pending" | "Replied" | "No Response" | "Dealing" | "Booked" | "Closed";
     priority?: boolean;
     spam?: boolean;
+    isConverted?: boolean;
+    replies?: { text: string; sentAt: string }[];
     createdAt?: string;
   };
   

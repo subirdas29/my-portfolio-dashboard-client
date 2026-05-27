@@ -35,6 +35,7 @@ export const createClient = async (payload: Omit<TClient, '_id' | 'createdAt' | 
       body: JSON.stringify(payload),
     });
     revalidateTag('Clients', "");
+    revalidateTag('Contact', "");
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -72,6 +73,7 @@ export const deleteClient = async (id: string) => {
       method: 'DELETE',
     });
     revalidateTag('Clients', "");
+    revalidateTag('Contact', "");
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };

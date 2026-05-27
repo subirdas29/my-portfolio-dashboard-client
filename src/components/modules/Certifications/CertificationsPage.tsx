@@ -1,17 +1,37 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ExternalLink, Award } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, Award, Upload, X, FileText, ImageIcon, Loader2 } from "lucide-react";
 import { TCertification } from "@/types/certification";
 import { createCertification, updateCertification, deleteCertification } from "@/services/Certifications";
 import { toast } from "sonner";
 import Image from "next/image";
+
+const BASE_API = process.env.NEXT_PUBLIC_BASE_API;
+
+async function uploadImage(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${BASE_API}/upload/image`, { method: "POST", body: fd });
+  const data = await res.json();
+  if (!data?.data) throw new Error("Image upload failed");
+  return data.data as string;
+}
+
+async function uploadRaw(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${BASE_API}/upload/upload-raw`, { method: "POST", body: fd });
+  const data = await res.json();
+  if (!data?.data) throw new Error("File upload failed");
+  return data.data as string;
+}
 
 export default function CertificationsPage({ certifications: initial }: { certifications: TCertification[] }) {
   const router = useRouter();
@@ -20,47 +40,77 @@ export default function CertificationsPage({ certifications: initial }: { certif
   const [addOpen, setAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<TCertification | null>(null);
 
-  const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const payload = {
+  const buildPayload = async (
+    fd: FormData,
+    badgeFile: File | null,
+    certFile: File | null,
+    existingBadge?: string,
+    existingCertFile?: string,
+  ) => {
+    let badgeImage = existingBadge;
+    let certificateFile = existingCertFile;
+
+    if (badgeFile) badgeImage = await uploadImage(badgeFile);
+    if (certFile) certificateFile = await uploadRaw(certFile);
+
+    return {
       title: fd.get("title") as string,
       issuer: fd.get("issuer") as string,
       issueDate: (fd.get("issueDate") as string) || undefined,
       expiryDate: (fd.get("expiryDate") as string) || undefined,
       credentialUrl: (fd.get("credentialUrl") as string) || undefined,
-      badgeImage: (fd.get("badgeImage") as string) || undefined,
+      badgeImage: badgeImage || undefined,
+      certificateFile: certificateFile || undefined,
     };
-    const res = await createCertification(payload);
-    if (res?.success !== false) {
-      toast.success("Certification added");
-      setAddOpen(false);
-      startTransition(() => router.refresh());
-    } else {
-      toast.error(res?.message || "Failed to add");
+  };
+
+  const handleCreate = async (
+    e: React.FormEvent<HTMLFormElement>,
+    badgeFile: File | null,
+    certFile: File | null,
+  ) => {
+    e.preventDefault();
+    try {
+      const payload = await buildPayload(new FormData(e.currentTarget), badgeFile, certFile);
+      const res = await createCertification(payload);
+      if (res?.success !== false) {
+        toast.success("Certification added");
+        setAddOpen(false);
+        startTransition(() => router.refresh());
+      } else {
+        toast.error(res?.message || "Failed to add");
+      }
+    } catch {
+      toast.error("Upload failed");
     }
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdate = async (
+    e: React.FormEvent<HTMLFormElement>,
+    badgeFile: File | null,
+    certFile: File | null,
+  ) => {
     e.preventDefault();
     if (!editItem) return;
-    const fd = new FormData(e.currentTarget);
-    const payload = {
-      title: fd.get("title") as string,
-      issuer: fd.get("issuer") as string,
-      issueDate: (fd.get("issueDate") as string) || undefined,
-      expiryDate: (fd.get("expiryDate") as string) || undefined,
-      credentialUrl: (fd.get("credentialUrl") as string) || undefined,
-      badgeImage: (fd.get("badgeImage") as string) || undefined,
-    };
-    const res = await updateCertification(editItem._id, payload);
-    if (res?.success !== false) {
-      toast.success("Updated");
-      setCertifications((prev) => prev.map((c) => (c._id === editItem._id ? { ...c, ...payload } : c)));
-      setEditItem(null);
-      startTransition(() => router.refresh());
-    } else {
-      toast.error("Failed to update");
+    try {
+      const payload = await buildPayload(
+        new FormData(e.currentTarget),
+        badgeFile,
+        certFile,
+        editItem.badgeImage,
+        editItem.certificateFile,
+      );
+      const res = await updateCertification(editItem._id, payload);
+      if (res?.success !== false) {
+        toast.success("Updated");
+        setCertifications((prev) => prev.map((c) => (c._id === editItem._id ? { ...c, ...payload } : c)));
+        setEditItem(null);
+        startTransition(() => router.refresh());
+      } else {
+        toast.error("Failed to update");
+      }
+    } catch {
+      toast.error("Upload failed");
     }
   };
 
@@ -82,7 +132,7 @@ export default function CertificationsPage({ certifications: initial }: { certif
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Add Certification</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Add Certification</DialogTitle></DialogHeader>
             <CertForm onSubmit={handleCreate} submitLabel="Add" />
           </DialogContent>
@@ -122,11 +172,18 @@ export default function CertificationsPage({ certifications: initial }: { certif
                   {cert.issueDate && <span>Issued: {cert.issueDate}</span>}
                   {cert.expiryDate && <span>· Expires: {cert.expiryDate}</span>}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {cert.credentialUrl && (
                     <Button variant="outline" size="sm" asChild className="h-7 text-xs">
                       <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-3 w-3 mr-1" /> View
+                        <ExternalLink className="h-3 w-3 mr-1" /> Credential
+                      </a>
+                    </Button>
+                  )}
+                  {cert.certificateFile && (
+                    <Button variant="outline" size="sm" asChild className="h-7 text-xs">
+                      <a href={cert.certificateFile} target="_blank" rel="noopener noreferrer">
+                        <FileText className="h-3 w-3 mr-1" /> Certificate
                       </a>
                     </Button>
                   )}
@@ -136,7 +193,7 @@ export default function CertificationsPage({ certifications: initial }: { certif
                         <Pencil className="h-3 w-3 mr-1" /> Edit
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto">
                       <DialogHeader><DialogTitle>Edit Certification</DialogTitle></DialogHeader>
                       <CertForm onSubmit={handleUpdate} submitLabel="Save" defaultValues={cert} />
                     </DialogContent>
@@ -155,12 +212,46 @@ export default function CertificationsPage({ certifications: initial }: { certif
 }
 
 function CertForm({ onSubmit, submitLabel, defaultValues }: {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>, badgeFile: File | null, certFile: File | null) => Promise<void>;
   submitLabel: string;
   defaultValues?: Partial<TCertification>;
 }) {
+  const [badgeFile, setBadgeFile] = useState<File | null>(null);
+  const [badgePreview, setBadgePreview] = useState<string>(defaultValues?.badgeImage || "");
+  const [certFile, setCertFile] = useState<File | null>(null);
+  const [certFileName, setCertFileName] = useState<string>(
+    defaultValues?.certificateFile ? "Existing file" : "",
+  );
+  const [loading, setLoading] = useState(false);
+  const badgeRef = useRef<HTMLInputElement>(null);
+  const certRef = useRef<HTMLInputElement>(null);
+
+  const handleBadgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBadgeFile(file);
+    setBadgePreview(URL.createObjectURL(file));
+  };
+
+  const handleCertFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCertFile(file);
+    setCertFileName(file.name);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await onSubmit(e, badgeFile, certFile);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1">
         <Label htmlFor="title">Title *</Label>
         <Input id="title" name="title" defaultValue={defaultValues?.title} required placeholder="AWS Certified Developer" />
@@ -183,11 +274,72 @@ function CertForm({ onSubmit, submitLabel, defaultValues }: {
         <Label htmlFor="credentialUrl">Credential URL</Label>
         <Input id="credentialUrl" name="credentialUrl" type="url" defaultValue={defaultValues?.credentialUrl} placeholder="https://..." />
       </div>
-      <div className="space-y-1">
-        <Label htmlFor="badgeImage">Badge Image URL</Label>
-        <Input id="badgeImage" name="badgeImage" type="url" defaultValue={defaultValues?.badgeImage} placeholder="https://..." />
+
+      {/* Badge Image Upload */}
+      <div className="space-y-2">
+        <Label>Badge Image</Label>
+        <div className="flex items-center gap-3">
+          {badgePreview ? (
+            <div className="relative w-14 h-14 rounded-lg border overflow-hidden shrink-0">
+              <Image src={badgePreview} alt="Badge preview" fill className="object-contain p-1" />
+              <button
+                type="button"
+                onClick={() => { setBadgePreview(""); setBadgeFile(null); if (badgeRef.current) badgeRef.current.value = ""; }}
+                className="absolute top-0 right-0 bg-destructive text-white rounded-bl p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <div className="w-14 h-14 rounded-lg border border-dashed flex items-center justify-center bg-muted shrink-0">
+              <ImageIcon className="h-5 w-5 text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex-1">
+            <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => badgeRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5 mr-1.5" /> Upload Badge Image
+            </Button>
+            <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WebP, SVG</p>
+            <input ref={badgeRef} type="file" accept="image/*" className="hidden" onChange={handleBadgeChange} />
+          </div>
+        </div>
       </div>
-      <Button type="submit" className="w-full">{submitLabel}</Button>
+
+      {/* Certificate File Upload (PDF or Image) */}
+      <div className="space-y-2">
+        <Label>Certificate File</Label>
+        <div className="flex items-center gap-3">
+          {certFileName ? (
+            <div className="flex items-center gap-2 flex-1 bg-muted rounded-lg px-3 py-2 min-w-0">
+              <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-xs truncate flex-1">{certFileName}</span>
+              <button
+                type="button"
+                onClick={() => { setCertFileName(""); setCertFile(null); if (certRef.current) certRef.current.value = ""; }}
+                className="text-muted-foreground hover:text-destructive shrink-0"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <Button type="button" variant="outline" size="sm" className="flex-1" onClick={() => certRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5 mr-1.5" /> Upload Certificate (PDF / Image)
+            </Button>
+          )}
+          <input ref={certRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleCertFileChange} />
+        </div>
+        {defaultValues?.certificateFile && !certFileName && (
+          <a href={defaultValues.certificateFile} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline flex items-center gap-1">
+            <ExternalLink className="h-3 w-3" /> View existing certificate
+          </a>
+        )}
+        <p className="text-xs text-muted-foreground">PDF or image file — uploaded to Cloudinary</p>
+      </div>
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+        {submitLabel}
+      </Button>
     </form>
   );
 }

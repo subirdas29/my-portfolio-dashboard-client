@@ -10,7 +10,11 @@ const CalendarPageRoute = async () => {
     getAllGoals(new Date().getFullYear()).catch(() => ({ data: [] })),
   ]);
 
-  const orders: TOrder[] = Array.isArray(ordersRes?.data?.result) ? ordersRes.data.result : [];
+  const orders: TOrder[] = Array.isArray(ordersRes?.data?.result)
+    ? ordersRes.data.result
+    : Array.isArray(ordersRes?.data)
+    ? ordersRes.data
+    : [];
   const goals: TGoal[] = Array.isArray(goalsRes?.data) ? goalsRes.data : [];
 
   return <CalendarPage orders={orders} goals={goals} />;

@@ -31,7 +31,7 @@ export const getRevenueByMonth = async (months = 6) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/orders/revenue?months=${months}`,
-      { next: { tags: ['Orders'], revalidate: 300 } },
+      { next: { tags: ['Orders'] } },
     );
     return await res.json();
   } catch {
@@ -48,7 +48,7 @@ export const createOrder = async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -62,7 +62,7 @@ export const updateOrder = async (id: string, payload: Partial<TOrder>) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -79,7 +79,7 @@ export const updateMilestone = async (orderId: string, milestoneId: string, done
         body: JSON.stringify({ done }),
       },
     );
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -93,7 +93,7 @@ export const addOrderNote = async (orderId: string, content: string) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),
     });
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -105,7 +105,7 @@ export const deleteOrderNote = async (orderId: string, noteIndex: number) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/orders/${orderId}/notes/${noteIndex}`, {
       method: 'DELETE',
     });
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };
@@ -117,7 +117,7 @@ export const deleteOrder = async (id: string) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/orders/${id}`, {
       method: 'DELETE',
     });
-    revalidateTag('Orders', "");
+    revalidateTag('Orders');
     return await res.json();
   } catch (e: unknown) {
     return { success: false, message: (e as Error).message };

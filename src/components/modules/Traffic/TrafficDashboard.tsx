@@ -194,16 +194,16 @@ export default function TrafficDashboard({
                   <ResponsiveContainer width={120} height={120}>
                     <PieChart>
                       <Pie data={stats.deviceBreakdown} dataKey="count" nameKey="device" cx="50%" cy="50%" innerRadius={30} outerRadius={55}>
-                        {stats.deviceBreakdown.map((e) => (
-                          <Cell key={e.device} fill={DEVICE_COLORS[e.device] || "#94a3b8"} />
+                        {stats.deviceBreakdown.map((e, i) => (
+                          <Cell key={`${e.device}-${i}`} fill={DEVICE_COLORS[e.device] || "#94a3b8"} />
                         ))}
                       </Pie>
                       <Tooltip contentStyle={{ fontSize: 12 }} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="space-y-2 flex-1">
-                    {stats.deviceBreakdown.map((d) => (
-                      <div key={d.device} className="flex items-center justify-between text-sm">
+                    {stats.deviceBreakdown.map((d, i) => (
+                      <div key={`${d.device}-${i}`} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ background: DEVICE_COLORS[d.device] || "#94a3b8" }} />
                           <span className="capitalize text-muted-foreground">{d.device}</span>
@@ -226,8 +226,8 @@ export default function TrafficDashboard({
             <CardContent>
               {stats?.referrerBreakdown?.length ? (
                 <div className="space-y-2">
-                  {stats.referrerBreakdown.slice(0, 5).map((r) => (
-                    <div key={r.referrer} className="flex items-center justify-between text-sm">
+                  {stats.referrerBreakdown.slice(0, 5).map((r, i) => (
+                    <div key={`${r.referrer}-${i}`} className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground truncate max-w-[180px]">
                         {r.referrer || "Direct"}
                       </span>

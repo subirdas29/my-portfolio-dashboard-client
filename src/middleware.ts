@@ -17,8 +17,8 @@ export const middleware = async(request:NextRequest)=>{
             return NextResponse.next()
         }
         else{
-            return NextResponse.redirect(new URL(`https://subirdas-portfolio-dashboard.vercel.app/login?redirectPath=${pathname}`,request.url))
-            // return NextResponse.redirect(new URL(`http://localhost:3001/login?redirectPath=${pathname}`,request.url))
+            // return NextResponse.redirect(new URL(`https://subirdas-portfolio-dashboard.vercel.app/login?redirectPath=${pathname}`,request.url))
+            return NextResponse.redirect(new URL(`http://localhost:3001/login?redirectPath=${pathname}`,request.url))
           
         }
     }
