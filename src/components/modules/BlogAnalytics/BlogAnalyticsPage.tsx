@@ -52,7 +52,8 @@ export default function BlogAnalyticsPage({
 }: {
   data: TBlogAnalyticsData | null;
 }) {
-  const totalBlogs = data?.publishedVsDraft?.reduce((s, p) => s + p.count, 0) ?? 0;
+  const publishedVsDraft: TBlogAnalyticsData['publishedVsDraft'] = Array.isArray(data?.publishedVsDraft) ? data!.publishedVsDraft : [];
+  const totalBlogs = publishedVsDraft.reduce((s, p) => s + p.count, 0);
 
   if (!data || totalBlogs === 0) {
     return (
@@ -67,9 +68,9 @@ export default function BlogAnalyticsPage({
   }
 
   const publishedCount =
-    data.publishedVsDraft.find((s) => s.status === "published")?.count ?? 0;
+    publishedVsDraft.find((s) => s.status === "published")?.count ?? 0;
   const draftCount =
-    data.publishedVsDraft.find((s) => s.status === "draft")?.count ?? 0;
+    publishedVsDraft.find((s) => s.status === "draft")?.count ?? 0;
 
   return (
     <div className="space-y-6">
@@ -173,7 +174,7 @@ export default function BlogAnalyticsPage({
               <ResponsiveContainer width={140} height={140}>
                 <PieChart>
                   <Pie
-                    data={data.publishedVsDraft}
+                    data={publishedVsDraft}
                     dataKey="count"
                     nameKey="status"
                     cx="50%"
@@ -181,7 +182,7 @@ export default function BlogAnalyticsPage({
                     innerRadius={35}
                     outerRadius={65}
                   >
-                    {data.publishedVsDraft.map((e) => (
+                    {publishedVsDraft.map((e) => (
                       <Cell
                         key={e.status}
                         fill={STATUS_COLORS[e.status] || "#94a3b8"}
@@ -192,7 +193,7 @@ export default function BlogAnalyticsPage({
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-3 flex-1">
-                {data.publishedVsDraft.map((s) => (
+                {publishedVsDraft.map((s) => (
                   <div key={s.status} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
